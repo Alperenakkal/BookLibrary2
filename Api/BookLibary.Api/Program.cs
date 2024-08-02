@@ -5,6 +5,7 @@ using BookLibary.Api.Services.AuthServices;
 using BookLibary.Api.Services.AuthServices.LoginServices;
 using BookLibary.Api.Services.AuthServices.RegisterServices;
 using BookLibary.Api.Services.AuthServices.TokenServices;
+using BookLibary.Api.Services.AuthServices.UpdateServices;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ builder.Services.AddScoped<IUserRepository<User>, LoginRepository>();
 
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUpdateService, UpdateService>();
 
 
 
