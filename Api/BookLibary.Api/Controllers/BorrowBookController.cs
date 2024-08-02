@@ -36,14 +36,14 @@ namespace BookLibary.Api.Controllers
             //var userId = User.FindFirst("userId")?.Value;
             //var userName = await _tokenHelperService.GetUserNameFromToken()
 
-            var token = Request.Cookies["AuthToken"];
+            var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YWI0ZmI2ODA2NTYyNDg5YjRmMDgwNSIsIm5iZiI6MTcyMjYwNTMyOCwiZXhwIjoxNzIyNjM1MzI4LCJpc3MiOiJJc3N1ZXJJbmZvcm1hdGlvbiIsImF1ZCI6IkF1ZGllbmNlSW5mb3JtYXRpb24ifQ.ERyiNAGA8S1vzFBd3iqYJpFSLSD8mWuQD49Y0xIZe4I";//Request.Cookies["AuthToken"];
 
             if (string.IsNullOrEmpty(token))
             {
                 return Unauthorized("Token bulunamadı.");
             }
 
-           // var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+           // var token = Request.Headers["Authorization"].ToString();
 
             //if (string.IsNullOrEmpty(token))
             //{
@@ -54,9 +54,9 @@ namespace BookLibary.Api.Controllers
 
             if (string.IsNullOrEmpty(userName))
             {
-                return Unauthorized("Geçersiz token.");
+                return Unauthorized(userName);
             }
-            var existingBook = await _borrowService.GetByNameAsync(userName);//?
+            var existingBook = await _borrowService.GetByNameAsync(userName);//?           
             if (existingBook == null)
             {
                 return NotFound();
