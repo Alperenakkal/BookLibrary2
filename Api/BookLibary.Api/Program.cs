@@ -1,6 +1,10 @@
 using BookLibary.Api.Data.Context;
 using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
+
+
+using BookLibary.Api.Services.AuthServices.BookServices;
+
 using BookLibary.Api.Services.AuthServices.BorrowServices;
 using BookLibary.Api.Services.AuthServices.LoginServices;
 using BookLibary.Api.Services.AuthServices.RegisterServices;
@@ -13,12 +17,16 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoSettings"));
 builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<IUserRepository<User>, LoginRepository>();
+builder.Services.AddScoped<IBookRepository<Book>, BookRepository>();
+builder.Services.AddScoped<IBookService, BookService>();
+
 
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -34,13 +42,7 @@ builder.Services.AddScoped<IRegisterRepository<User>, RegisterRepository>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 
 
-builder.Services.AddScoped<IRepository<User>, MongoRepositoryBase<User>>();
 
-
-builder.Services.AddScoped<IUpdateService, UpdateService>();
-
-builder.Services.AddScoped<IRepository<Book>, MongoRepositoryBase<Book>>();
-builder.Services.AddScoped<BookService>();
 builder.Services.AddHttpContextAccessor();
 
 

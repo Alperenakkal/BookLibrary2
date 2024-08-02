@@ -1,6 +1,4 @@
-﻿
-using BookLibary.Api.Dtos.UserDto;
-using BookLibary.Api.Models;
+﻿using BookLibary.Api.Models;
 using BookLibary.Api.Models.Request.UserRequest;
 using BookLibary.Api.Models.Response.UserResponse;
 using BookLibary.Api.Repositories;
