@@ -23,8 +23,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Web\BookLibary.Web\BookLibary.Web.csproj" />
-  </ItemGroup>
+ 
 
 </Project>

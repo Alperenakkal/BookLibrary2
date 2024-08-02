@@ -16,6 +16,9 @@ namespace BookLibary.Api.Models
         [BsonElement("Email")]
         public string Email { get; set; }
 
+        [BsonElement("Admin")]
+        public bool IsAdmin { get; set; }
+
 
     }
 }

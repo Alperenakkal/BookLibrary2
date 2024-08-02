@@ -52,10 +52,17 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
                 };
                 _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
 
+                if (user.IsAdmin == true)
+                {
+                    response.Admin = "Admin";
+                }
+                else { response.Admin = "Kullanici"; }
 
             }
+           
             return response;
         }
+        
         public async Task LogoutUserAsync()
         {
             var cookieOptions = new CookieOptions

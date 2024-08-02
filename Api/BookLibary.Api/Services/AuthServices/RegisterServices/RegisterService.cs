@@ -32,7 +32,9 @@ namespace BookLibary.Api.Services.AuthServices.RegisterServices
                 UserName = model.UserName,
                 FullName = model.FullName,
                 Email = model.Email,
-                Password = model.Password
+                Password = model.Password,
+                IsAdmin=false,
+
             };
 
             await _repository.InsertOneAsync(user);
