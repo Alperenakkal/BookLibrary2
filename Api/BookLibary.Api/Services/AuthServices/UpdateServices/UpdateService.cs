@@ -27,18 +27,18 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
         {
             UpdateUserDto dto = new UpdateUserDto();
 
-           
-            var token = await _contextAccessor.HttpContext.GetTokenAsync("AuthToken");
+            // Authorization header'dan token'ı alıyoruz
+            var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            
 
             if (string.IsNullOrEmpty(token))
             {
                 throw new UnauthorizedAccessException("Token bulunamadı");
             }
 
-            
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtToken = tokenHandler.ReadJwtToken(token);
-            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -54,7 +54,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
             {
                 // ID'yi kullanarak kullanıcıyı güncelleme
                 await _repository.UpdateUserAsync(userId, user);
-                
+
                 dto.UserName = user.UserName;
                 dto.FullName = user.FullName;
                 dto.Email = user.Email;
@@ -69,6 +69,8 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
                 throw new Exception("Güncelleme işlemi başarısız", ex);
             }
         }
+
+
 
     }
 }

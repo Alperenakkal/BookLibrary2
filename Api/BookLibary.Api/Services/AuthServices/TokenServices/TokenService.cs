@@ -26,7 +26,7 @@ namespace BookLibary.Api.Services.AuthServices.TokenServices
                     issuer: configuration["AppSettings:ValidIssuer"],
                     audience: configuration["AppSettings:ValidAudience"],
                     claims: new List<Claim> {
-                    new Claim("userName", request.Username)
+                    new Claim("id", request.id)
                     },
                     notBefore: dateTimeNow,
                     expires: dateTimeNow.Add(TimeSpan.FromMinutes(500)),

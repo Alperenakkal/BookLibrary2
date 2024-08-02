@@ -27,7 +27,7 @@ namespace BookLibary.Api.Repositories
             return await _model.Find(filter).FirstOrDefaultAsync();
         }
 
-        public async Task<User> GetUserByIdAsync(object _id)
+        public async Task<User> GetUserById(object _id)
         {
             try
             {
@@ -39,13 +39,13 @@ namespace BookLibary.Api.Repositories
 
                 throw new Exception("Id getirme işlemi başarısız");
             }
-          
         }
 
-        public async Task<User> UpdateUserAsync(User entity,Object _id)
-        {
-            
+      
 
+
+        public async Task<User> UpdateUserAsync(object _id, User entity)
+        {
             try
             {
                 var filter = Builders<User>.Filter.Eq("_id", _id);
