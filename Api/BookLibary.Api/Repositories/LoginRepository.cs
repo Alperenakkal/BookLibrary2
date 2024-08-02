@@ -1,6 +1,7 @@
 ﻿using BookLibary.Api.Data.Context;
 using BookLibary.Api.Dtos.UserDto;
 using BookLibary.Api.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -41,23 +42,36 @@ namespace BookLibary.Api.Repositories
             }
         }
 
-      
 
 
-        public async Task<User> UpdateUserAsync(object _id, User entity)
+        public async Task<User> UpdateUserAsync(object id, User entity)
         {
             try
             {
-                var filter = Builders<User>.Filter.Eq("_id", _id);
-                var updatedUser = await _model.ReplaceOneAsync(filter, entity);
-                return entity;
+                var filter = Builders<User>.Filter.Eq("_id", new ObjectId(id.ToString()));
+                var update = Builders<User>.Update
+                    .Set(u => u.UserName, entity.UserName)
+                    .Set(u => u.FullName, entity.FullName)
+                    .Set(u => u.Email, entity.Email)
+                    .Set(u => u.Password, entity.Password);
 
+                var result = await _model.UpdateOneAsync(filter, update);
+
+                if (result.IsAcknowledged && result.ModifiedCount > 0)
+                {
+                    return entity;
+                }
+                else
+                {
+                    throw new Exception("User not updated or not found");
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw new Exception("Update Error");
+                throw new Exception("Update Error", ex);
             }
         }
     }
+
 }
+

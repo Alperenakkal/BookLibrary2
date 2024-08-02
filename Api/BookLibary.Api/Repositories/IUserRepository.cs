@@ -1,9 +1,11 @@
-﻿namespace BookLibary.Api.Repositories
+﻿using BookLibary.Api.Models;
+
+namespace BookLibary.Api.Repositories
 {
     public interface IUserRepository<TEntity> where TEntity : class
     {
         Task<TEntity> GetByNameAsync(string userName);
-        Task<TEntity> UpdateUserAsync(Object _id,TEntity entity);
+        Task<User> UpdateUserAsync(object id, User entity);
         Task<TEntity> GetUserById(Object  _id);
     }
 }
