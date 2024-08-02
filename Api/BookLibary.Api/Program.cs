@@ -2,8 +2,10 @@ using BookLibary.Api.Data.Context;
 using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
 using BookLibary.Api.Services.AuthServices;
+using BookLibary.Api.Services.AuthServices.BorrowServices;
 using BookLibary.Api.Services.AuthServices.LoginServices;
 using BookLibary.Api.Services.AuthServices.RegisterServices;
+using BookLibary.Api.Services.AuthServices.TokenHelperServices;
 using BookLibary.Api.Services.AuthServices.TokenServices;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,11 +19,17 @@ builder.Services.AddScoped<IUserRepository<User>, LoginRepository>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddScoped<ITokenHelperService, TokenHelperService>();
+builder.Services.AddScoped<IBorrowService, BorrowService>();
+
+
 
 
 builder.Services.AddScoped<IRegisterRepository<User>, RegisterRepository>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 
+
+builder.Services.AddScoped<IRepository<User>, MongoRepositoryBase<User>>();
 
 builder.Services.AddScoped<IRepository<Book>, MongoRepositoryBase<Book>>();
 builder.Services.AddScoped<BookService>();
