@@ -1,11 +1,10 @@
 using BookLibary.Api.Data.Context;
 using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
-using BookLibary.Api.Services.AuthServices;
 using BookLibary.Api.Services.AuthServices.LoginServices;
 using BookLibary.Api.Services.AuthServices.RegisterServices;
+using BookLibary.Api.Services.AuthServices.BookServices;
 using BookLibary.Api.Services.AuthServices.TokenServices;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoSettings"));
 builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<IUserRepository<User>, LoginRepository>();
+builder.Services.AddScoped<IBookRepository<Book>, BookRepository>();
+builder.Services.AddScoped<IBookService, BookService>();
+
 
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -23,8 +25,7 @@ builder.Services.AddScoped<IRegisterRepository<User>, RegisterRepository>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 
 
-builder.Services.AddScoped<IRepository<Book>, MongoRepositoryBase<Book>>();
-builder.Services.AddScoped<BookService>();
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
