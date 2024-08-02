@@ -31,36 +31,51 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
         public async Task<LoginResponse> LoginUserAsync(LoginRequest request)
         {
             LoginResponse response = new LoginResponse();
-            User user = await _repository.GetByNameAsync(request.Username);
-            if (string.IsNullOrEmpty(request.Username) && string.IsNullOrEmpty(request.Password))
+
+            if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
             {
-                throw new NullReferenceException(nameof(request));
+                throw new ArgumentException("Username and Password cannot be null or empty.");
             }
-            if (request.Username == user.UserName && request.Password == user.Password)
+
+            User user = await _repository.GetByNameAsync(request.Username);
+
+            if (user == null)
             {
-                
-                var generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { Username = request.Username });
+                response.AuthenticateResult = false;
+                return response;
+            }
+            
+
+
+            if (request.Password == user.Password)
+            {
+                var generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = user.Id.ToString() });
+
                 response.AuthenticateResult = true;
                 response.AuthToken = generatedTokenInformation.Token;
                 response.AccessTokenExpireDate = generatedTokenInformation.TokenExpireDate;
+
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Expires = generatedTokenInformation.TokenExpireDate
+                    Expires = generatedTokenInformation.TokenExpireDate,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
                 };
-                _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
+                _contextAccessor.HttpContext.Response.Cookies.Append("Bearer", generatedTokenInformation.Token, cookieOptions);
 
-                if (user.IsAdmin == true)
-                {
-                    response.Admin = "Admin";
-                }
-                else { response.Admin = "Kullanici"; }
-
+                response.Admin = user.IsAdmin ? "Admin" : "Kullanici";
             }
-           
+            else
+            {
+                response.AuthenticateResult = false;
+            }
+
             return response;
         }
-        
+
+
+
         public async Task LogoutUserAsync()
         {
             var cookieOptions = new CookieOptions

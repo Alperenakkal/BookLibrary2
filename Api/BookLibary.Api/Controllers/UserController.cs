@@ -1,8 +1,10 @@
 ﻿using BookLibary.Api.Dtos;
+using BookLibary.Api.Dtos.UserDto;
 using BookLibary.Api.Models;
 using BookLibary.Api.Models.Request.UserRequest;
 using BookLibary.Api.Models.Response.UserResponse;
 using BookLibary.Api.Services.AuthServices.LoginServices;
+using BookLibary.Api.Services.AuthServices.UpdateServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +16,11 @@ namespace BookLibary.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly ILoginService _service;
-
-        public UserController(ILoginService service)
+        private readonly IUpdateService _updateService;
+        public UserController(ILoginService service,IUpdateService updateService )
         {
             _service = service;
+            _updateService = updateService;
         }
 
         [HttpGet("{name}")]
@@ -51,6 +54,23 @@ namespace BookLibary.Api.Controllers
             await _service.LogoutUserAsync();
             return Ok(new { message = "User logged out successfully." });
         }
+        [HttpPut("UpdateUser")]
+
+        public async Task<ActionResult<UpdateUserDto>> UpdateUserAsync([FromBody] UpdateUserDto model)
+        {
+            User user = new User
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+                Password = model.Password,
+                FullName = model.FullName,
+                IsAdmin = false,
+
+
+            };
+            var result = await _updateService.UpdateUserAsync(user);
+            return result;
+        }   
 
 
     }
