@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
  using BookLibary.Api.Data.Context;
  using BookLibary.Api.Models;
  using Microsoft.Extensions.Options;
@@ -39,10 +39,9 @@ using System.Collections;
             {
                 var data = await _collection.Find(_ => true).ToListAsync();
 
-                // Debugging purposes
                 if (data == null)
                 {
-                    result.Message = "No data found.";
+                    result.Message = "Kitap Bulunamadı";
                     result.Success = false;
                 }
                 else
@@ -53,7 +52,7 @@ using System.Collections;
             }
             catch (Exception ex)
             {
-                result.Message = $"An error occurred while retrieving data: {ex.Message}";
+                result.Message = "Kitaplar Yüklenemedi";
                 result.Success = false;
             }
             return result;
