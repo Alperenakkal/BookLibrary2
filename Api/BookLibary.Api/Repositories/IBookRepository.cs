@@ -5,7 +5,7 @@ using BookLibary.Api.Models;
 
          Task<T> GetByIdAsync(string id);
          Task<T> InsertOneAsync(Book book);
-         Task<GetManyResult<Book>> GetAllAsync(string name);
-         GetOneResult<Book> DeleteById(string id);
+         Task<GetManyResult<Book>> GetAllAsync();
+         Task<GetOneResult<Book>> DeleteByNameAsync(string bookName);
     } 
  }

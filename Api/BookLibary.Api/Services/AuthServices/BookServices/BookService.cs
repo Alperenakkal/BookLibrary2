@@ -20,14 +20,14 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
              return await _bookRepository.InsertOneAsync(book);
         }
 
-        public GetOneResult<Book> DeleteBook(string id)
+        public async Task<GetOneResult<Book>> DeleteBook(string bookName)
         {
-            return  _bookRepository.DeleteById(id);
+            return await _bookRepository.DeleteByNameAsync(bookName);
         }
 
-        public async Task <GetManyResult<Book>> GetAllBooksAsync(string name)
+        public async Task <GetManyResult<Book>> GetAllBooksAsync()
         {
-            return await _bookRepository.GetAllAsync(name);
+            return await _bookRepository.GetAllAsync();
         }
         public async Task<Book> GetByIdAsync(string id)
         {
