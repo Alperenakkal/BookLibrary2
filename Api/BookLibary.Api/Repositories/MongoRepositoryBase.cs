@@ -1,10 +1,12 @@
 ﻿using BookLibary.Api.Models;
+using BookLibary.Api.Repositories;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 
-namespace BookLibary.Api.Repositories
+
+namespace BankApp.Persistence.Repository
 {
     public class MongoRepositoryBase<TEntity> : IRepository<TEntity> where TEntity : class, new()
     {

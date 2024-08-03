@@ -13,8 +13,8 @@ using System.Collections;
          private readonly IMongoCollection<Book> _collection;
          private readonly MongoDbContext _context;
 
-         private readonly IMongoCollection<Book> _model;
-         //private Api.Models.Book book;
+         //private readonly IMongoCollection<Book> _model;
+       
 
          public BookRepository(MongoDbContext context,IOptions<MongoSettings> settings)
          {
@@ -22,55 +22,68 @@ using System.Collections;
              var database = client.GetDatabase(settings.Value.Database);
 
              _context = context;
-             _model = context.GetCollection<Book>("Books");
-             _collection = database.GetCollection<Book>(typeof(Book).Name);
+             //_model = context.GetCollection<Book>("Books");
+             _collection = database.GetCollection<Book>("Books");  // (typeof(Book).Name)
 
          }
          
          public async Task<Book> InsertOneAsync(Book book)
          {
-             await _model.InsertOneAsync(book);
+             await _collection.InsertOneAsync(book);
              return book;
          }
-         public async Task<GetManyResult<Book>> GetAllAsync(string name)
-         {
-             var result = new GetManyResult<Book>();
-             try
-             {
-                 var data = await _collection.AsQueryable().ToListAsync();
-                 result.Result = data;
-             }
-             catch (Exception ex)
-             {
-                 result.Message = $"AsQueryable {ex.Message}";
-                 result.Success = false;
-             }
-             return result;
-         }
+        public async Task<GetManyResult<Book>> GetAllAsync()
+        {
+            var result = new GetManyResult<Book>();
+            try
+            {
+                var data = await _collection.Find(_ => true).ToListAsync();
 
-             public GetOneResult<Book> DeleteById(string id)
-             {
-             var result = new GetOneResult<Book>();
-             try
-             {
-                 var objectId = ObjectId.Parse(id);
-                 var filter = Builders<Book>.Filter.Eq("_id", objectId);
-                 var data = _collection.FindOneAndDelete(filter);
-                 result.Entity = data;
-             }
-             catch (Exception ex)
-             {
-                 result.Message = $"DeleteById {ex.Message}";
-                 result.Success = false;
-             }
-             return result;
-         }
+                // Debugging purposes
+                if (data == null)
+                {
+                    result.Message = "No data found.";
+                    result.Success = false;
+                }
+                else
+                {
+                    result.Result = data;
+                    result.Success = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = $"An error occurred while retrieving data: {ex.Message}";
+                result.Success = false;
+            }
+            return result;
+        }
+
+
+        public async Task<GetOneResult<Book>> DeleteByNameAsync(string bookName)
+        {
+            var result = new GetOneResult<Book>();
+            try
+            {
+                var filter = Builders<Book>.Filter.Eq(x => x.BookName, bookName);
+                var data = await _collection.FindOneAndDeleteAsync(filter);
+                result.Entity = data;
+                result.Success = data != null;
+            }
+            catch (Exception ex)
+            {
+                result.Message = $"An error occurred while deleting the book: {ex.Message}";
+                result.Success = false;
+            }
+            return result;
+        }
+
         public Task<Book> GetByIdAsync(string id)
         {
              var filter = Builders<Book>.Filter.Eq(x => x.BookName, id);
-             return _model.Find(filter).FirstOrDefaultAsync();
+             return _collection.Find(filter).FirstOrDefaultAsync();
         }
 
-    
+      
     }
  } 
