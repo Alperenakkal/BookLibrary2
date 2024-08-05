@@ -27,13 +27,17 @@ builder.Services.AddScoped<IUserRepository<User>, LoginRepository>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IUpdateService, UpdateService>();
 
+builder.Services.AddScoped<IUpdateService, UpdateService>();
+
 builder.Services.AddScoped<IBookRepository<Book>, BookRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ITokenHelperService, TokenHelperService>();
 
-//builder.Services.AddScoped<IBorrowService, BorrowService>();      //this service is not able to be constructed (Error while validating the service descriptor 
+builder.Services.AddScoped<IBorrowService, BorrowService>();      //this service is not able to be constructed (Error while validating the service descriptor 
+builder.Services.AddScoped<IRepository<User>, MongoRepositoryBase<User>>();
+//this service is not able to be constructed (Error while validating the service descriptor 
 
 builder.Services.AddScoped<IRegisterRepository<User>, RegisterRepository>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
