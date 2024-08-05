@@ -3,6 +3,7 @@ using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
 using BookLibary.Api.Services.AuthServices.TokenServices;
 using BookLibary.Api.Services.AuthServices.UpdateServices;
+using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,14 +16,16 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
 
         private readonly IRepository<User> _repository;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IMemoryCache _memoryCache;
         //private readonly IMongoCollection<User> _model;
 
 
-        public BorrowService(IUserRepository<User> userRepository, IRepository<User> repository, IHttpContextAccessor contextAccessor)
+        public BorrowService(IUserRepository<User> userRepository, IRepository<User> repository, IHttpContextAccessor contextAccessor,IMemoryCache memoryCache)
         {
             _repository = repository;
             _userRepository = userRepository;
             _contextAccessor = contextAccessor;
+            _memoryCache = memoryCache;
             //  _model = model;
         }
 
@@ -56,14 +59,16 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         public async Task AddBorrowedBookAsync(BarrowBookIdDto bookId)
         {
             var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            var redisToken = _memoryCache.Get("Bearer").ToString();
 
-            if (string.IsNullOrEmpty(token))
+
+            if (string.IsNullOrEmpty(redisToken))
             {
                 throw new UnauthorizedAccessException("Token bulunamadı");
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var jwtToken = tokenHandler.ReadJwtToken(redisToken);
             var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
 
             if (string.IsNullOrEmpty(userId))
