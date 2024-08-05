@@ -18,12 +18,12 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         //private readonly IMongoCollection<User> _model;
 
 
-        public BorrowService(IUserRepository<User> userRepository,IRepository<User> repository, IHttpContextAccessor contextAccessor)
+        public BorrowService(IUserRepository<User> userRepository, IRepository<User> repository, IHttpContextAccessor contextAccessor)
         {
             _repository = repository;
             _userRepository = userRepository;
             _contextAccessor = contextAccessor;
-          //  _model = model;
+            //  _model = model;
         }
 
         public async Task<User> GetByNameAsync(string id)
@@ -35,16 +35,16 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             throw new ArgumentException("Geçersiz ID formatı");
         }
 
-        public async Task<GetOneResult<User>> UpdateUserAsync(ObjectId id, User user)
+        public async Task<GetOneResult<User>> UpdateUserAsync(string id, User user)
         {
             BorrowBookDto dto = new BorrowBookDto();
             try
             {
                 // ID'yi kullanarak kullanıcıyı güncelleme
-              //  await _repository.UpdateUserAsync(id, user);
+                //  await _repository.UpdateUserAsync(id, user);
 
                 dto.Id = user.Id;
-                
+
             }
             catch (Exception ex)
             {
@@ -53,10 +53,9 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             return await _repository.ReplaceOneAsync(user, id.ToString());
         }
 
-        public async Task AddBorrowedBookAsync( ObjectId bookId)
+        public async Task AddBorrowedBookAsync(BarrowBookIdDto bookId)
         {
             var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
-
 
             if (string.IsNullOrEmpty(token))
             {
@@ -69,22 +68,57 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
 
             if (string.IsNullOrEmpty(userId))
             {
-                throw new InvalidOperationException(userId);
+                throw new InvalidOperationException("Geçersiz kullanıcı kimliği");
             }
-            
-            var user = await GetByNameAsync(userId);
+
+            var user = await GetByNameAsync(userId); // Kullanıcıyı ID'ye göre buluyoruz
 
             if (user == null)
             {
                 throw new KeyNotFoundException("Kullanıcı bulunamadı.");
             }
 
-            if (!user.BorrowBooks.Contains(bookId))
+            // Kitap ID'sini ObjectId'ye dönüştürüyoruz
+            ObjectId bookIdR;
+            try
             {
-                user.BorrowBooks.Add(bookId);
+                bookIdR = new ObjectId(bookId.Id);
+            }
+            catch (FormatException)
+            {
+                throw new ArgumentException("Geçersiz kitap ID'si");
             }
 
-            await UpdateUserAsync(bookId,user);
+            if (!user.BorrowBooks.Contains(bookIdR))
+            {
+               
+                var borrowBooksList = user.BorrowBooks.ToList();
+                borrowBooksList.Add(bookIdR);
+
+
+                var userResponse = new User
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    UserName = user.UserName,
+                    Password = user.Password,
+                    BorrowBooks = borrowBooksList
+                };
+                
+
+           
+                var updateResult = await _userRepository.UpdateUserAsync(user.Id, userResponse);
+
+                if (updateResult==null)
+                {
+                    throw new Exception("Kullanıcı güncellenemedi");
+                }
+            }
+            if (user.BorrowBooks.Contains(bookIdR))
+            {
+                throw new Exception("Kitap önceden ödünç alınmış");
+            }
         }
+
     }
 }

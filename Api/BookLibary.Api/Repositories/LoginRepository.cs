@@ -50,10 +50,11 @@ namespace BookLibary.Api.Repositories
             {
                 var filter = Builders<User>.Filter.Eq("_id", new ObjectId(id.ToString()));
                 var update = Builders<User>.Update
-                    .Set(u => u.UserName, entity.UserName)
-                    .Set(u => u.FullName, entity.FullName)
-                    .Set(u => u.Email, entity.Email)
-                    .Set(u => u.Password, entity.Password);
+          .Set(u => u.FullName, entity.FullName)
+          .Set(u => u.UserName, entity.UserName)
+          .Set(u => u.Password, entity.Password)
+          .Set(u => u.BorrowBooks, entity.BorrowBooks);
+
 
                 var result = await _model.UpdateOneAsync(filter, update);
 

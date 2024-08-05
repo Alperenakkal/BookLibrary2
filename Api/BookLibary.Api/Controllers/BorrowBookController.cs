@@ -37,13 +37,10 @@ namespace BookLibary.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBorrowedBookAsync([FromBody] BorrowBookDto model)
+        public async Task<IActionResult> AddBorrowedBookAsync([FromBody] BarrowBookIdDto id)
         {
-            var user = new User
-            {
-                BorrowBooks = [model.Id]
-            };
-               await _borrowService.AddBorrowedBookAsync(user);
+            
+               await _borrowService.AddBorrowedBookAsync(id);
 
             return Ok("Kitap başarıyla ödünç alındı.");
         }

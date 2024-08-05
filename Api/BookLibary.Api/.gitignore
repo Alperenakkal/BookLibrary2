@@ -8,6 +8,7 @@ appsetings.json
 bin/
 obj/
 
+appsettings.json
 # User-specific files
 *.rsuser
 *.suo
