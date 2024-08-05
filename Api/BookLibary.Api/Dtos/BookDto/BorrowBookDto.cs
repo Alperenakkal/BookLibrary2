@@ -15,9 +15,9 @@ namespace BookLibary.Api.Dtos.BookDto
          public string? Yazar { get; set; }
 
          [DataMember]
-         [BsonElement("Durum")]
+         [BsonElement("IsAvailable")]
 
-         public bool Durum { get; set; }
+         public bool IsAvailable { get; set; } 
 
          public DateTime BorrowDate {get; set;}
 

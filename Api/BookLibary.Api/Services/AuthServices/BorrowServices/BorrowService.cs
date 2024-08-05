@@ -119,11 +119,23 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                     throw new Exception("Kullanıcı güncellenemedi");
                 }
             }
-            if (user.BorrowBooks.Contains(bookIdR))
+        }
+            public async Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR){
+            
+            var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+             
+            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            var user = await GetByNameAsync(userId);
+            ObjectId bookIdr = new ObjectId(bookIdR.Id);
+            
+            if (user.BorrowBooks.Contains(bookIdr))
             {
                 throw new Exception("Kitap önceden ödünç alınmış");
             }
+            return true;
         }
-
     }
-}
+}   
+
