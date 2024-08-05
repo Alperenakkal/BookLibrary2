@@ -12,21 +12,45 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
     public class BorrowService : IBorrowService
     {
         private readonly IUserRepository<User> _userRepository;
+        private readonly IBookRepository<Book> _bookRepository;
 
         private readonly IRepository<User> _repository;
         private readonly IHttpContextAccessor _contextAccessor;
         //private readonly IMongoCollection<User> _model;
 
 
-        public BorrowService(IUserRepository<User> userRepository, IRepository<User> repository, IHttpContextAccessor contextAccessor)
+        public BorrowService(IUserRepository<User> userRepository, IRepository<User> repository, IHttpContextAccessor contextAccessor, IBookRepository<Book> bookRepository)
         {
             _repository = repository;
             _userRepository = userRepository;
             _contextAccessor = contextAccessor;
-            //  _model = model;
+            _bookRepository = bookRepository;
         }
-
-        public async Task<User> GetByNameAsync(string id)
+        public async Task<List<Book>> GetByNameAsync(string name)
+        {
+            User user = await _userRepository.GetByNameAsync(name);
+            var bookList = new List<Book>();
+            var borrowBooksList = user.BorrowBooks.ToList();
+            foreach (var book in borrowBooksList)
+            {
+                var book1 = await _bookRepository.GetByIdAsync(book.ToString());
+                if (book1 != null)
+                {
+                    var bookResponse = new Book
+                    {
+                        Id = book1.Id,
+                        BookName = book1.BookName,
+                        Author = book1.Author,
+                        Publisher = book1.Publisher,
+                        IsAvailable = false
+                    };
+                    bookList.Add(bookResponse);
+                }
+            }
+           
+            return bookList;
+        }
+        public async Task<User> GetByIdAsync(string id)
         {
             if (ObjectId.TryParse(id, out ObjectId objectId))
             {
@@ -71,7 +95,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 throw new InvalidOperationException("Geçersiz kullanıcı kimliği");
             }
 
-            var user = await GetByNameAsync(userId); // Kullanıcıyı ID'ye göre buluyoruz
+            var user = await GetByIdAsync(userId); // Kullanıcıyı ID'ye göre buluyoruz
 
             if (user == null)
             {

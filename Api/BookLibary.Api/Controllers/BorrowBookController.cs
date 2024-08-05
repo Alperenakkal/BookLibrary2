@@ -32,8 +32,9 @@ namespace BookLibary.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetByNameAsync(string name)
         {
-            User user = await _borrowService.GetByNameAsync(name);
-            return Ok(user);
+
+            List<Book> book = await _borrowService.GetByNameAsync(name);
+            return Ok(book);
         }
 
         [HttpPost]
