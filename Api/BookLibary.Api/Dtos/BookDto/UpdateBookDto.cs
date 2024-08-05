@@ -1,13 +1,22 @@
-﻿namespace BookLibary.Api.Dtos.BookDto
-{
-    public class UpdateBookDto
-    {
-        public int Id { get; set; }
+﻿using MongoDB.Bson;
+ using MongoDB.Bson.Serialization.Attributes;
 
-        public string Name { get; set; }
+ namespace BookLibary.Api.Dtos.BookDto
+ {
+     public class UpdateBookDto
+     {
+         [BsonId]
+         public ObjectId Id { get; set; }
+         [BsonElement("BookName")]
 
-        public string Yazar { get; set; }
+         public string? BookName { get; set; }
 
-        public int Durum { get; set; }
-    }
-}
+         [BsonElement("Yazar")]
+
+         public string? Yazar { get; set; }
+
+         [BsonElement("Durum")]
+
+         public bool Durum { get; set; }
+     }
+ }

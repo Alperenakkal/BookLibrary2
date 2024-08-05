@@ -1,40 +1,42 @@
 ﻿using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
+//using BookLibary.Api.Controllers;
 
-namespace BookLibary.Api.Services.AuthServices
+
+
+namespace BookLibary.Api.Services.AuthServices.BookServices
 {
-    public class BookService
+    public class BookService:IBookService
     {
-        private readonly IRepository<Book> _bookRepository;
+        private readonly IBookRepository<Book> _bookRepository;
 
-        public BookService(IRepository<Book> bookRepository)
+        public BookService(IBookRepository<Book> bookRepository)
         {
             _bookRepository = bookRepository;
         }
 
-        public GetManyResult<Book> GetAllBooks()
+        public async Task<Book> CreateBookAsync(Book book)
         {
-            return _bookRepository.GetAll();
+             return await _bookRepository.InsertOneAsync(book);
         }
 
-        public Task<GetOneResult<Book>> GetBookByIdAsync(string id)
+        public async Task<GetOneResult<Book>> DeleteBook(string bookName)
         {
-            return _bookRepository.GetByIdAsync(id);
+            return await _bookRepository.DeleteByNameAsync(bookName);
         }
 
-        public Task<GetOneResult<Book>> CreateBookAsync(Book book)
+        public async Task <GetManyResult<Book>> GetAllBooksAsync()
         {
-            return _bookRepository.InsertOneAsync(book);
+            return await _bookRepository.GetAllAsync();
+        }
+        public async Task<Book> GetByIdAsync(string id)
+        {
+            return await _bookRepository.GetByIdAsync(id);
         }
 
-        public Task<GetOneResult<Book>> UpdateBookAsync(string id, Book book)
-        {
-            return _bookRepository.ReplaceOneAsync(book, id);
-        }
-
-        public Task<GetOneResult<Book>> DeleteBookAsync(string id)
-        {
-            return _bookRepository.DeleteByIdAsync(id);
-        }
+        // public Task<GetOneResult<Book>> UpdateBookAsync(string id, Book book)
+        // {
+        //     throw new NotImplementedException();
+        // }
     }
 }
