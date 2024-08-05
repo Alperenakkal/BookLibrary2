@@ -45,7 +45,7 @@ builder.Services.AddScoped<IRegisterService, RegisterService>();
 
 
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddMemoryCache();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
