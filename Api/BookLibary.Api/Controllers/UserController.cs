@@ -8,6 +8,7 @@ using BookLibary.Api.Services.AuthServices.UpdateServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BookLibary.Api.Controllers
 {
@@ -17,10 +18,13 @@ namespace BookLibary.Api.Controllers
     {
         private readonly ILoginService _service;
         private readonly IUpdateService _updateService;
-        public UserController(ILoginService service,IUpdateService updateService )
+        private readonly IMemoryCache _memoryCache;
+        public UserController(ILoginService service,IUpdateService updateService,IMemoryCache memoryCache )
         {
             _service = service;
             _updateService = updateService;
+            _memoryCache = memoryCache;
+            
         }
 
         [HttpGet("{name}")]
@@ -52,6 +56,7 @@ namespace BookLibary.Api.Controllers
         public async Task<IActionResult> Logout()
         {
             await _service.LogoutUserAsync();
+            _memoryCache.Remove("Bearer");
             return Ok(new { message = "User logged out successfully." });
         }
         [HttpPut("UpdateUser")]
@@ -70,7 +75,19 @@ namespace BookLibary.Api.Controllers
             };
             var result = await _updateService.UpdateUserAsync(user);
             return result;
-        }   
+        }
+        [HttpGet("redis/{name}")]
+        public void Set(string name)
+        {
+            _memoryCache.Set("name", name);
+          
+        }
+        [HttpGet("redis get")]
+        public string Get() 
+        {
+            return _memoryCache.Get<string>("Bearer");
+
+        }
 
 
     }

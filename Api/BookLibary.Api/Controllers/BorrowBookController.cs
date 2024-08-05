@@ -2,6 +2,7 @@
 using BookLibary.Api.Dtos.BookDto;
 using BookLibary.Api.Models;
 using BookLibary.Api.Services.AuthServices;
+using BookLibary.Api.Services.AuthServices.BookServices;
 using BookLibary.Api.Services.AuthServices.BorrowServices;
 using BookLibary.Api.Services.AuthServices.TokenHelperServices;
 using BookLibary.Api.Services.AuthServices.UpdateServices;
@@ -19,12 +20,16 @@ namespace BookLibary.Api.Controllers
         private readonly ITokenHelperService _tokenHelperService;
         private readonly IUpdateService _updateService;
 
+        private readonly IBookService _bookService;
 
 
-        public BorrowBookController(IBorrowService borrowService, ITokenHelperService tokenHelperService, IUpdateService updateService)
+
+        public BorrowBookController(IBorrowService borrowService, ITokenHelperService tokenHelperService, IUpdateService updateService,IBookService bookService)
         {
             _borrowService = borrowService;
             _tokenHelperService = tokenHelperService;
+            _updateService   =updateService;
+            _bookService = bookService;
            
         }
 
@@ -38,12 +43,17 @@ namespace BookLibary.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBorrowedBookAsync([FromBody] BarrowBookIdDto id)
-        {
+        public async Task<IActionResult> AddBorrowedBookAsync([FromBody] BarrowBookIdDto bookIdR)
+        { 
+            var isAvailable = await _borrowService.IsBookAvailableAsync(bookIdR);
             
-               await _borrowService.AddBorrowedBookAsync(id);
-
+           
+            await _borrowService.AddBorrowedBookAsync(bookIdR);
             return Ok("Kitap başarıyla ödünç alındı.");
+            
+            
+            
+            
         }
 
 

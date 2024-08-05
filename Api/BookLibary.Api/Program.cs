@@ -35,9 +35,9 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ITokenHelperService, TokenHelperService>();
 
-builder.Services.AddScoped<IBorrowService, BorrowService>();      //this service is not able to be constructed (Error while validating the service descriptor 
+builder.Services.AddScoped<IBorrowService, BorrowService>();     
 builder.Services.AddScoped<IRepository<User>, MongoRepositoryBase<User>>();
-//this service is not able to be constructed (Error while validating the service descriptor 
+
 
 builder.Services.AddScoped<IRegisterRepository<User>, RegisterRepository>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
@@ -45,7 +45,7 @@ builder.Services.AddScoped<IRegisterService, RegisterService>();
 
 
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddMemoryCache();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

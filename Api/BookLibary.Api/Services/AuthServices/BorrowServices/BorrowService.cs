@@ -3,6 +3,7 @@ using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
 using BookLibary.Api.Services.AuthServices.TokenServices;
 using BookLibary.Api.Services.AuthServices.UpdateServices;
+using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,6 +17,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
 
         private readonly IRepository<User> _repository;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IMemoryCache _memoryCache;
         //private readonly IMongoCollection<User> _model;
 
 
@@ -24,7 +26,9 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             _repository = repository;
             _userRepository = userRepository;
             _contextAccessor = contextAccessor;
+
             _bookRepository = bookRepository;
+
         }
         public async Task<List<Book>> GetByNameAsync(string name)
         {
@@ -80,14 +84,16 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         public async Task AddBorrowedBookAsync(BarrowBookIdDto bookId)
         {
             var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            var redisToken = _memoryCache.Get("Bearer").ToString();
 
-            if (string.IsNullOrEmpty(token))
+
+            if (string.IsNullOrEmpty(redisToken))
             {
                 throw new UnauthorizedAccessException("Token bulunamadı");
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var jwtToken = tokenHandler.ReadJwtToken(redisToken);
             var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
 
             if (string.IsNullOrEmpty(userId))
@@ -138,11 +144,23 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                     throw new Exception("Kullanıcı güncellenemedi");
                 }
             }
-            if (user.BorrowBooks.Contains(bookIdR))
+        }
+            public async Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR){
+            
+            var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+             
+            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            var user = await GetByNameAsync(userId);
+            ObjectId bookIdr = new ObjectId(bookIdR.Id);
+            
+            if (user.BorrowBooks.Contains(bookIdr))
             {
                 throw new Exception("Kitap önceden ödünç alınmış");
             }
+            return true;
         }
-
     }
-}
+}   
+

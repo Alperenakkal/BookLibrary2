@@ -3,6 +3,7 @@ using BookLibary.Api.Models.Request.UserRequest;
 using BookLibary.Api.Models.Response.UserResponse;
 using BookLibary.Api.Repositories;
 using BookLibary.Api.Services.AuthServices.TokenServices;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BookLibary.Api.Services.AuthServices.LoginServices
 {
@@ -11,13 +12,15 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
         private readonly IUserRepository<User> _repository;
         private readonly ITokenService _tokenService;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IMemoryCache _memoryCache;
 
 
-        public LoginService(IUserRepository<User> repository, ITokenService tokenService, IHttpContextAccessor contextAccessor)
+        public LoginService(IUserRepository<User> repository, ITokenService tokenService, IHttpContextAccessor contextAccessor,IMemoryCache memoryCache)
         {
             _repository = repository;
             _tokenService = tokenService;
             _contextAccessor = contextAccessor;
+            _memoryCache = memoryCache;
         }
 
         public async Task<User> GetByNameAsync(string name)
@@ -62,7 +65,8 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
                     Secure = true,
                     SameSite = SameSiteMode.Strict
                 };
-                _contextAccessor.HttpContext.Response.Cookies.Append("Bearer", generatedTokenInformation.Token, cookieOptions);
+                
+                _memoryCache.Set("Bearer",generatedTokenInformation.Token);
 
                 response.Admin = user.IsAdmin ? "Admin" : "Kullanici";
             }
