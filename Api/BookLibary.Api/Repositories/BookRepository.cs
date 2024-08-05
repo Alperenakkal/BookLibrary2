@@ -1,6 +1,6 @@
 ﻿using System.Collections;
- using BookLibary.Api.Data.Context;
- using BookLibary.Api.Models;
+using BookLibary.Api.Data.Context;
+using BookLibary.Api.Models;
  using Microsoft.Extensions.Options;
  using MongoDB.Bson;
  using MongoDB.Driver;
@@ -77,10 +77,19 @@
             return result;
         }
 
-        public Task<Book> GetByIdAsync(string id)
+        public async Task<Book> GetByIdAsync(string _id)
         {
-             var filter = Builders<Book>.Filter.Eq(x => x.BookName, id);
-             return _collection.Find(filter).FirstOrDefaultAsync();
+            var objectId = new ObjectId(_id);
+            try
+            {
+                var filter = Builders<Book>.Filter.Eq("_id", objectId);
+                return await _collection.Find(filter).FirstOrDefaultAsync();
+            }
+            catch (Exception)
+            {
+
+                throw new Exception("Id getirme işlemi başarısız");
+            }
         }
 
       
