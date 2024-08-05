@@ -27,7 +27,6 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
         {
             UpdateUserDto dto = new UpdateUserDto();
 
-            // Authorization header'dan token'ı alıyoruz
             var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
             
 
