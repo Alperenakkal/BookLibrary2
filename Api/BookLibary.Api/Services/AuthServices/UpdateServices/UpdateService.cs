@@ -35,8 +35,8 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
 
             var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
             var redisToken = _memoryCache.Get("Bearer").ToString();
-         
 
+          
             if (string.IsNullOrEmpty(redisToken))
             {
                 throw new UnauthorizedAccessException("Token bulunamadı");
