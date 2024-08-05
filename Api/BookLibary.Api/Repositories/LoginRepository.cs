@@ -12,7 +12,7 @@ namespace BookLibary.Api.Repositories
     public class LoginRepository : IUserRepository<User>
     {
         private readonly MongoDbContext _context;
-        private readonly IMongoCollection<User> _model;
+        private readonly IMongoCollection<User> _model;  
 
         public LoginRepository(MongoDbContext context)
         {

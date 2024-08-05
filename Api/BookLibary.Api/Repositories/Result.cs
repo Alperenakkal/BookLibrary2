@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BookLibary.Api.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -17,6 +18,7 @@ namespace BookLibary.Api.Repositories{
     public class GetOneResult<TEntity> : Result where TEntity : class, new()
     {
         public TEntity? Entity { get; set; }
+        public GetOneResult<User> Document { get; internal set; }
     }
     public class GetManyResult<TEntity> : Result where TEntity : class, new()
     {

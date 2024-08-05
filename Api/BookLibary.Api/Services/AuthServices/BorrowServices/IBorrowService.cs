@@ -8,8 +8,8 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
     {
 
         Task<User> GetByNameAsync(string name);
-        Task<GetOneResult<User>> UpdateUserAsync(string id, User user);
-        Task AddBorrowedBookAsync(string name, ObjectId bookId);
+        Task<GetOneResult<User>> UpdateUserAsync(ObjectId id, User user);
+        Task AddBorrowedBookAsync( ObjectId bookId);
 
 
     }
