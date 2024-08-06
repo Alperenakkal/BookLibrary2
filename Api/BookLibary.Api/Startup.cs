@@ -67,7 +67,8 @@ public class Startup
                 {
                     policy.WithOrigins("http://localhost:4200")  // İzin verilen köken
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                             .AllowCredentials();
                 });
         });
 
@@ -115,7 +116,7 @@ public class Startup
             SeedData.Initialize(services);
         }
 
-        app.UseCors("AllowSpecificOrigin");
+        app.UseCors("AllowAll");
 
         // Swagger ve diğer middleware'ler
         if (env.IsDevelopment())
