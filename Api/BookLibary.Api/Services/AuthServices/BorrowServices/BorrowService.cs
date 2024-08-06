@@ -95,23 +95,8 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         }
         public async Task AddBorrowedBookAsync(BarrowBookIdDto bookId,string userId)
         {
-            //var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
-            //var redisToken = _memoryCache.Get("Bearer").ToString();
-
-
-            //if (string.IsNullOrEmpty(redisToken))
-            //{
-            //    throw new UnauthorizedAccessException("Token bulunamadı");
-            //}
-
-            //var tokenHandler = new JwtSecurityTokenHandler();
-            //var jwtToken = tokenHandler.ReadJwtToken(redisToken);
-            //var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-
-            //if (string.IsNullOrEmpty(userId))
-            //{
-            //    throw new InvalidOperationException("Geçersiz kullanıcı kimliği");
-            //}
+            
+           
 
             var user = await GetByIdAsync(userId); // Kullanıcıyı ID'ye göre buluyoruz
 

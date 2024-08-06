@@ -62,15 +62,15 @@ public class Startup
         // CORS politikası
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowSpecificOrigin",
-                policy =>
+            options.AddPolicy("AllowAllOrigins",
+                builder =>
                 {
-                    policy.WithOrigins("http://localhost:4200")  // İzin verilen köken
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader()
+                           .AllowCredentials(); // Bu ayar cookie'lerin gönderilmesini sağlar
                 });
         });
-
         services.AddControllers();
 
         // Swagger yapılandırması
@@ -115,7 +115,7 @@ public class Startup
             SeedData.Initialize(services);
         }
 
-        app.UseCors("AllowSpecificOrigin");
+        app.UseCors("AllowAllOrigins");
 
         // Swagger ve diğer middleware'ler
         if (env.IsDevelopment())
