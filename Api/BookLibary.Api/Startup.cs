@@ -65,10 +65,10 @@ public class Startup
             options.AddPolicy("AllowSpecificOrigin",
                 policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200")  // İzin verilen köken
+                    policy.WithOrigins("http://localhost:4200") // İzin verilen köken
                           .AllowAnyHeader()
                           .AllowAnyMethod()
-                             .AllowCredentials();
+                          .AllowCredentials(); // Bu satır önemli
                 });
         });
 
@@ -79,7 +79,6 @@ public class Startup
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "BookLibrary API", Version = "v1" });
-
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
@@ -89,21 +88,20 @@ public class Startup
                 In = ParameterLocation.Header,
                 Description = "Enter 'Bearer' [space] and then your token."
             });
-
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
             {
+                new OpenApiSecurityScheme
                 {
-                    new OpenApiSecurityScheme
+                    Reference = new OpenApiReference
                     {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    Array.Empty<string>()
-                }
-            });
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
         });
     }
 
@@ -116,9 +114,9 @@ public class Startup
             SeedData.Initialize(services);
         }
 
-        app.UseCors("AllowAll");
+        // CORS politikalarını uygulama
+        app.UseCors("AllowSpecificOrigin");
 
-        // Swagger ve diğer middleware'ler
         if (env.IsDevelopment())
         {
             app.UseSwagger();
@@ -132,11 +130,11 @@ public class Startup
         app.UseAuthentication();
         app.UseAuthorization();
 
-        // MapControllers'ı EndpointRouteBuilder üzerinden çağır
         app.UseRouting();
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
         });
     }
+
 }
