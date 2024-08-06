@@ -21,12 +21,12 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         //private readonly IMongoCollection<User> _model;
 
 
-        public BorrowService(IUserRepository<User> userRepository, IRepository<User> repository, IHttpContextAccessor contextAccessor, IBookRepository<Book> bookRepository)
+        public BorrowService(IUserRepository<User> userRepository, IRepository<User> repository, IHttpContextAccessor contextAccessor, IBookRepository<Book> bookRepository,IMemoryCache memoryCache)
         {
             _repository = repository;
             _userRepository = userRepository;
             _contextAccessor = contextAccessor;
-
+            _memoryCache = memoryCache;
             _bookRepository = bookRepository;
 
         }
@@ -148,17 +148,18 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             public async Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR){
             
             var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            var redisToken = _memoryCache.Get("Bearer").ToString();
             var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var jwtToken = tokenHandler.ReadJwtToken(redisToken);
              
             var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-            var user = await GetByNameAsync(userId);
+            var user = await GetByIdAsync(userId);
             ObjectId bookIdr = new ObjectId(bookIdR.Id);
             
-            //if (user.BorrowBooks.Contains(bookIdr))
-            //{
-            //    throw new Exception("Kitap önceden ödünç alınmış");
-            //}
+            if (user.BorrowBooks.Contains(bookIdr))
+            {
+                throw new Exception("Kitap önceden ödünç alınmış");
+            }
             return true;
         }
     }
