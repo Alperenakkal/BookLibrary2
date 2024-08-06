@@ -1,12 +1,11 @@
 ﻿using BookLibary.Api.Dtos.BookDto;
 using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
-using BookLibary.Api.Services.AuthServices.TokenServices;
-using BookLibary.Api.Services.AuthServices.UpdateServices;
 using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 
 namespace BookLibary.Api.Services.AuthServices.BorrowServices
 {
@@ -18,10 +17,11 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         private readonly IRepository<User> _repository;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IMemoryCache _memoryCache;
-        //private readonly IMongoCollection<User> _model;
 
 
-        public BorrowService(IUserRepository<User> userRepository, IRepository<User> repository, IHttpContextAccessor contextAccessor, IBookRepository<Book> bookRepository,IMemoryCache memoryCache)
+
+        public BorrowService(IUserRepository<User> userRepository, IRepository<User> repository, IHttpContextAccessor contextAccessor, IBookRepository<Book> bookRepository, IMemoryCache memoryCache)
+
         {
             _repository = repository;
             _userRepository = userRepository;
@@ -81,25 +81,25 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             return await _repository.ReplaceOneAsync(user, id.ToString());
         }
 
-        public async Task AddBorrowedBookAsync(BarrowBookIdDto bookId)
+        public async Task AddBorrowedBookAsync(BarrowBookIdDto bookId,string userId)
         {
-            var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
-            var redisToken = _memoryCache.Get("Bearer").ToString();
+            //var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            //var redisToken = _memoryCache.Get("Bearer").ToString();
 
 
-            if (string.IsNullOrEmpty(redisToken))
-            {
-                throw new UnauthorizedAccessException("Token bulunamadı");
-            }
+            //if (string.IsNullOrEmpty(redisToken))
+            //{
+            //    throw new UnauthorizedAccessException("Token bulunamadı");
+            //}
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(redisToken);
-            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            //var tokenHandler = new JwtSecurityTokenHandler();
+            //var jwtToken = tokenHandler.ReadJwtToken(redisToken);
+            //var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
 
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new InvalidOperationException("Geçersiz kullanıcı kimliği");
-            }
+            //if (string.IsNullOrEmpty(userId))
+            //{
+            //    throw new InvalidOperationException("Geçersiz kullanıcı kimliği");
+            //}
 
             var user = await GetByIdAsync(userId); // Kullanıcıyı ID'ye göre buluyoruz
 
@@ -145,6 +145,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 }
             }
         }
+
             public async Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR){
             
             var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
