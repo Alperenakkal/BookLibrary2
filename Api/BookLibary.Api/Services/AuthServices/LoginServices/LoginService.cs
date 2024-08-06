@@ -4,6 +4,8 @@ using BookLibary.Api.Models.Response.UserResponse;
 using BookLibary.Api.Repositories;
 using BookLibary.Api.Services.AuthServices.TokenServices;
 using Microsoft.Extensions.Caching.Memory;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BookLibary.Api.Services.AuthServices.LoginServices
 {
@@ -13,6 +15,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
         private readonly ITokenService _tokenService;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IMemoryCache _memoryCache;
+        private string hashPassword;
 
 
         public LoginService(IUserRepository<User> repository, ITokenService tokenService, IHttpContextAccessor contextAccessor,IMemoryCache memoryCache)
@@ -32,15 +35,22 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
         }
 
         public async Task<LoginResponse> LoginUserAsync(LoginRequest request)
+           
         {
             LoginResponse response = new LoginResponse();
+
+            User user = await _repository.GetByNameAsync(request.Username);
+            // hash 
+            SHA1 sha = new SHA1CryptoServiceProvider();
+            hashPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(request.Password)));
+
+
 
             if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
             {
                 throw new ArgumentException("Username and Password cannot be null or empty.");
             }
 
-            User user = await _repository.GetByNameAsync(request.Username);
 
             if (user == null)
             {
@@ -49,8 +59,8 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
             }
             
 
-
-            if (request.Password == user.Password)
+            // control hash password
+            if (user.Password == hashPassword)
             {
                 var generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = user.Id.ToString() });
 
