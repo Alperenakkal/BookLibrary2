@@ -80,7 +80,19 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             }
             return await _repository.ReplaceOneAsync(user, id.ToString());
         }
+        public async Task<User> RemoveBookAsync(string userId, BarrowBookIdDto bookIdR)
+        {
+            ObjectId id = new ObjectId(userId);
+            ObjectId bookId = new ObjectId(bookIdR.Id);
+            var user = await _userRepository.RemoveBookFromUserAsync(userId, bookId);
 
+            if(user == null)
+            {
+                throw new Exception("Kullanıcı bulunamadı");
+            }
+            return user;
+            ;
+        }
         public async Task AddBorrowedBookAsync(BarrowBookIdDto bookId,string userId)
         {
             //var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
