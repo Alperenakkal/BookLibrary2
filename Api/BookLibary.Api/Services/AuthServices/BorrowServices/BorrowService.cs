@@ -1,8 +1,6 @@
 ﻿using BookLibary.Api.Dtos.BookDto;
 using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
-using BookLibary.Api.Services.AuthServices.TokenServices;
-using BookLibary.Api.Services.AuthServices.UpdateServices;
 using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -19,10 +17,11 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         private readonly IRepository<User> _repository;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IMemoryCache _memoryCache;
-        //private readonly IMongoCollection<User> _model;
+
 
 
         public BorrowService(IUserRepository<User> userRepository, IRepository<User> repository, IHttpContextAccessor contextAccessor, IBookRepository<Book> bookRepository, IMemoryCache memoryCache)
+
         {
             _repository = repository;
             _userRepository = userRepository;
@@ -147,60 +146,15 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             }
         }
 
-        //public async Task RemoveBorrowedBookAsync( string bookId)
-
-        //{
-        //    var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
-        //    var redisToken = _memoryCache.Get("Bearer").ToString();
-
-
-        //    if (string.IsNullOrEmpty(redisToken))
-        //    {
-        //        throw new UnauthorizedAccessException("Token bulunamadı");
-        //    }
-
-        //    var tokenHandler = new JwtSecurityTokenHandler();
-        //    var jwtToken = tokenHandler.ReadJwtToken(redisToken);
-        //    var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-
-        //    if (string.IsNullOrEmpty(userId))
-        //    {
-        //        throw new InvalidOperationException("Geçersiz kullanıcı kimliği");
-        //    }
-        //    ObjectId bookIdr = new ObjectId(bookId);
-        //    ObjectId userIdr = new ObjectId(userId);
-
-
-        //    try
-        //    {
-        //        var filter = Builders<User>.Filter.Eq(u => u.Id,userIdr);
-        //        var update = Builders<User>.Update.PullFilter(u => u.BorrowBooks, b => b == bookIdr);
-
-        //        var result = await _userRepository.UpdateUserAsync(filter, 
-                    
-                    
-                    
-        //            update);
-
-        //        if (result.ModifiedCount == 0)
-        //        {
-        //            throw new Exception("Kitap kaldırma başarısız");
-        //        }
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        throw new Exception("kitap kaldırma işlemi sırasında bir hata oluştu");
-        //    }
-        //}
-
             public async Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR){
             
             var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            var redisToken = _memoryCache.Get("Bearer").ToString();
             var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(token);
+            var jwtToken = tokenHandler.ReadJwtToken(redisToken);
              
             var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-            var user = await GetByNameAsync(userId);
+            var user = await GetByIdAsync(userId);
             ObjectId bookIdr = new ObjectId(bookIdR.Id);
             
             if (user.BorrowBooks.Contains(bookIdr))
