@@ -155,10 +155,10 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             var user = await GetByNameAsync(userId);
             ObjectId bookIdr = new ObjectId(bookIdR.Id);
             
-            if (user.BorrowBooks.Contains(bookIdr))
-            {
-                throw new Exception("Kitap önceden ödünç alınmış");
-            }
+            //if (user.BorrowBooks.Contains(bookIdr))
+            //{
+            //    throw new Exception("Kitap önceden ödünç alınmış");
+            //}
             return true;
         }
     }
