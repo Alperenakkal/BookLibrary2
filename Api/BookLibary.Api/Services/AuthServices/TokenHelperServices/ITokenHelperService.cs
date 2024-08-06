@@ -5,7 +5,7 @@ namespace BookLibary.Api.Services.AuthServices.TokenHelperServices
 {
     public interface ITokenHelperService
     {
-        Task<string> GetUserNameFromToken(string token);
+        Task<string> GetIdFromToken();
 
     }
 }

@@ -11,9 +11,9 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         Task<List<Book>> GetByNameAsync(string name);
         Task<User> GetByIdAsync(string id);
         Task<GetOneResult<User>> UpdateUserAsync(string id, User user);
-        Task AddBorrowedBookAsync( BarrowBookIdDto bookId);
+        Task AddBorrowedBookAsync( BarrowBookIdDto bookId, string userId);
         Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR);
-
+        //Task RemoveBorrowedBookAsync( string bookId);
 
     }
 }

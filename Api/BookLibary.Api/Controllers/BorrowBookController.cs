@@ -44,11 +44,17 @@ namespace BookLibary.Api.Controllers
 
         [HttpPost]
         public async Task<IActionResult> AddBorrowedBookAsync([FromBody] BarrowBookIdDto bookIdR)
-        { 
+        {
+           var userId= await _tokenHelperService.GetIdFromToken();
+            if (userId == null)
+            {
+                throw new ArgumentNullException("userId");
+            }
+
             var isAvailable = await _borrowService.IsBookAvailableAsync(bookIdR);
             
            
-            await _borrowService.AddBorrowedBookAsync(bookIdR);
+            await _borrowService.AddBorrowedBookAsync(bookIdR,userId);
             return Ok("Kitap başarıyla ödünç alındı.");
             
             
