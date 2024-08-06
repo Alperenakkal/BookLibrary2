@@ -24,17 +24,17 @@ namespace BookLibary.Api.Controllers
 
 
 
-        public BorrowBookController(IBorrowService borrowService, ITokenHelperService tokenHelperService, IUpdateService updateService,IBookService bookService)
+        public BorrowBookController(IBorrowService borrowService, ITokenHelperService tokenHelperService, IUpdateService updateService, IBookService bookService)
         {
             _borrowService = borrowService;
             _tokenHelperService = tokenHelperService;
-            _updateService   =updateService;
+            _updateService = updateService;
             _bookService = bookService;
-           
+
         }
 
 
-        [HttpGet]
+        [HttpGet("GetByName")]
         public async Task<IActionResult> GetByNameAsync(string name)
         {
 
@@ -42,7 +42,7 @@ namespace BookLibary.Api.Controllers
             return Ok(book);
         }
 
-        [HttpPost]
+        [HttpPost("AddBorrow")]
         public async Task<IActionResult> AddBorrowedBookAsync([FromBody] BarrowBookIdDto bookIdR)
         {
            var userId= await _tokenHelperService.GetIdFromToken();
@@ -56,6 +56,15 @@ namespace BookLibary.Api.Controllers
             
             
             
+        }
+        [HttpDelete("RemoveBorrow")]
+        public async Task<IActionResult> RemoveBorrowedBookAsync([FromBody] BarrowBookIdDto bookIdR)
+        {
+            var userId = await _tokenHelperService.GetIdFromToken();
+            await _borrowService.RemoveBookAsync(userId, bookIdR);
+
+            return Ok("Kitap başarıyla geri verildi.");
+
         }
 
 

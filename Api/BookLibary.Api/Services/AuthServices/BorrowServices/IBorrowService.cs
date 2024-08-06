@@ -13,6 +13,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         Task<GetOneResult<User>> UpdateUserAsync(string id, User user);
         Task AddBorrowedBookAsync( BarrowBookIdDto bookId, string userId);
         Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR);
+        Task<User> RemoveBookAsync(string userId, BarrowBookIdDto bookId);
         //Task RemoveBorrowedBookAsync( string bookId);
 
     }
