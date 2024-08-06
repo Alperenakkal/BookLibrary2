@@ -1,6 +1,7 @@
 
 using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
+using MongoDB.Bson;
 
 namespace BookLibary.Api.Services.AuthServices.BookServices
 {
