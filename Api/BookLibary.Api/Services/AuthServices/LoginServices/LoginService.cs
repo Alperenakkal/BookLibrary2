@@ -65,7 +65,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
                     Secure = true,
                     SameSite = SameSiteMode.Strict
                 };
-                
+                _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
                 _memoryCache.Set("Bearer",generatedTokenInformation.Token);
 
                 response.Admin = user.IsAdmin ? "Admin" : "Kullanici";
