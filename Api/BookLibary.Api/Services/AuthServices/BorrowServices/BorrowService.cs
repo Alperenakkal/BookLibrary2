@@ -85,7 +85,8 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             ObjectId id = new ObjectId(userId);
             ObjectId bookId = new ObjectId(bookIdR.Id);
             var user = await _userRepository.RemoveBookFromUserAsync(userId, bookId);
-
+            
+            
             if(user == null)
             {
                 throw new Exception("Kullanıcı bulunamadı");
@@ -96,8 +97,6 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         public async Task AddBorrowedBookAsync(BarrowBookIdDto bookId,string userId)
         {
             
-           
-
             var user = await GetByIdAsync(userId); // Kullanıcıyı ID'ye göre buluyoruz
 
             if (user == null)
@@ -140,6 +139,11 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 {
                     throw new Exception("Kullanıcı güncellenemedi");
                 }
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(TimeSpan.FromDays(30));
+                    await RemoveBookAsync(userId, bookId);
+                });
             }
         }
 
