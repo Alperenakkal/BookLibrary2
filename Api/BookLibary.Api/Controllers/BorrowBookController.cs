@@ -68,6 +68,7 @@ namespace BookLibary.Api.Controllers
             return Ok("Kitap başarıyla geri verildi.");
 
         }
+
          [HttpPut("UpdateBorrowedBook")]
          public async Task<IActionResult> UpdateBook([FromBody] BarrowBookIdDto bookId)
          {
@@ -94,6 +95,17 @@ namespace BookLibary.Api.Controllers
 
             return Ok(result);
         }
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> IdGetUser(string id)
+        {
+
+            var user = await _borrowService.GetByIdAsync(id);
+
+         
+
+            return Ok(user);
+        }
+
 
     }
 }
