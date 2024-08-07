@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BookLibary.Api.Models;
 using BookLibary.Api.Services.AuthServices.BookServices;
+using BookLibary.Api.Dtos.BookDto;
 
 namespace BookLibary.Api.Controllers
 {
@@ -54,23 +55,7 @@ namespace BookLibary.Api.Controllers
             return Ok(CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book));
         }
 
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> UpdateBook(string id, [FromBody] Book book)
-        // {
-        //     var existingBook = await _bookService.GetBookByIdAsync(id);
-        //     if (existingBook.Entity == null)
-        //     {
-        //         return NotFound();
-        //     }
-
-        //     var result = await _bookService.UpdateBookAsync(id, book);
-        //     if (result.Success)
-        //     {
-        //         return NoContent();
-        //     }
-        //     return BadRequest(result.Message);
-        // }
-
+        
         [HttpDelete("{bookName}")]
         public async Task<IActionResult> DeleteBook(string bookName) 
         {
