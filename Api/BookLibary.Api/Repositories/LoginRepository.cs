@@ -53,7 +53,8 @@ namespace BookLibary.Api.Repositories
           .Set(u => u.FullName, entity.FullName)
           .Set(u => u.UserName, entity.UserName)
           .Set(u => u.Password, entity.Password)
-          .Set(u => u.BorrowBooks, entity.BorrowBooks);
+          .Set(u => u.BorrowBooks, entity.BorrowBooks)
+          .Set(u => u.ReadOutBooks, entity.ReadOutBooks);
 
 
                 var result = await _model.UpdateOneAsync(filter, update);

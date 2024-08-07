@@ -19,6 +19,8 @@ namespace BookLibary.Api.Models
 
         [BsonElement("BorrowBooks")]
         public List<ObjectId> BorrowBooks { get; set; } = new List<ObjectId>();
+        [BsonElement("ReadOutBooks")]
+        public List<ObjectId> ReadOutBooks {get; set;} = new List<ObjectId>();
 
 //        [BsonElement("ReadingBooks")]
 //        public List<string> ReadingBooks { get; set; } = new List<string>();
