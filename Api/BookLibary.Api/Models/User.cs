@@ -3,6 +3,12 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace BookLibary.Api.Models
 {
+
+    public enum GenderType
+    {
+        Male,
+        Female
+    }
     public class User:IUser
     {
         [BsonId]
@@ -28,6 +34,12 @@ namespace BookLibary.Api.Models
 
         [BsonElement("Admin")]
         public bool IsAdmin { get; set; }
+
+        [BsonElement("AvatarUrl")]
+        public string avatarUrl { get; set; }
+
+        [BsonElement("Gender")]
+        public GenderType gender {  get; set; }
 
 
     }

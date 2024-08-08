@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using BookLibary.Api.Models;
+using MongoDB.Bson;
 
 namespace BookLibary.Api.Dtos.UserDto
 {
@@ -11,5 +12,7 @@ namespace BookLibary.Api.Dtos.UserDto
         public required string Password { get; set; }
         public required string PasswordRepeat { get; set; }
         public string ?Email { get; set; }
+        public GenderType Gender { get; set; }
+
     }
 }
