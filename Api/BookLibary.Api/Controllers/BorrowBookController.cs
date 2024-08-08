@@ -34,13 +34,15 @@ namespace BookLibary.Api.Controllers
         }
 
 
-        [HttpGet("GetByName")]
+        
+         [HttpGet("GetByName")]
         public async Task<IActionResult> GetByNameAsync(string name)
         {
 
             List<Book> book = await _borrowService.GetByNameAsync(name);
             return Ok(book);
         }
+
 
         [HttpPost("AddBorrow")]
         public async Task<IActionResult> AddBorrowedBookAsync([FromBody] BarrowBookIdDto bookIdR)
@@ -57,7 +59,7 @@ namespace BookLibary.Api.Controllers
             
             
         }
-        [HttpDelete("RemoveBorrow")]
+        [HttpDelete("RemoveBorrowed")]
         public async Task<IActionResult> RemoveBorrowedBookAsync([FromBody] BarrowBookIdDto bookIdR)
         {
             var userId = await _tokenHelperService.GetIdFromToken();
@@ -65,6 +67,43 @@ namespace BookLibary.Api.Controllers
 
             return Ok("Kitap başarıyla geri verildi.");
 
+        }
+
+         [HttpPut("UpdateBorrowedBook")]
+         public async Task<IActionResult> UpdateBook([FromBody] BarrowBookIdDto bookId)
+         {
+
+             var userId = await _tokenHelperService.GetIdFromToken();
+             await _borrowService.AddtoReadoutBookAsync(bookId,userId);
+
+
+
+
+            
+             return Ok("Kitap Okunmuş Listenize Eklendi");
+         }
+         [HttpGet("GetReadOutByName")]
+        public async Task<IActionResult> GetReadoutBookByNameAsync(string name)
+        {
+
+             var readOutBooks = await _borrowService.GetReadOutAsync(name);
+
+            var result = new
+            {
+             ReadOutBooks = readOutBooks
+            };
+
+            return Ok(result);
+        }
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> IdGetUser(string id)
+        {
+
+            var user = await _borrowService.GetByIdAsync(id);
+
+         
+
+            return Ok(user);
         }
 
 

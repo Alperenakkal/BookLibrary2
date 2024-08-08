@@ -7,6 +7,7 @@ namespace BookLibary.Api.Dtos.BookDto
         public string Id { get; set; }
 
         // Optionally, if you need ObjectId in your code
+        public DateTime BorrowedAt { get; set; }
       
     }
 }

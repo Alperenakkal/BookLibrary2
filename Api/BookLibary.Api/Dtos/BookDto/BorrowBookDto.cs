@@ -18,9 +18,9 @@ namespace BookLibary.Api.Dtos.BookDto
          [BsonElement("IsAvailable")]
 
          public bool IsAvailable { get; set; } 
+         
 
-         public DateTime BorrowDate {get; set;}
-
-         public DateTime DueDate{get; set;}
+         
      }
  }
+ 
