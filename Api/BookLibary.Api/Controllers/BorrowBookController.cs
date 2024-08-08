@@ -35,11 +35,12 @@ namespace BookLibary.Api.Controllers
 
 
         
-         [HttpGet("GetByName")]
-        public async Task<IActionResult> GetByNameAsync(string name)
+         [HttpGet("GetBorrowBooks")]
+        public async Task<IActionResult> GetByNameAsync()
         {
+            var userId = await _tokenHelperService.GetIdFromToken();
 
-            List<Book> book = await _borrowService.GetByNameAsync(name);
+            List<Book> book = await _borrowService.GetBorrowBookAsync(userId);
             return Ok(book);
         }
 
@@ -83,10 +84,11 @@ namespace BookLibary.Api.Controllers
              return Ok("Kitap Okunmuş Listenize Eklendi");
          }
          [HttpGet("GetReadOutByName")]
-        public async Task<IActionResult> GetReadoutBookByNameAsync(string name)
+        public async Task<IActionResult> GetReadoutBookByNameAsync()
         {
+            var userId = await _tokenHelperService.GetIdFromToken();
 
-             var readOutBooks = await _borrowService.GetReadOutAsync(name);
+            var readOutBooks = await _borrowService.GetReadOutAsync(userId);
 
             var result = new
             {

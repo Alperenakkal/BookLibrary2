@@ -34,9 +34,10 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             _updateService = updateService;
 
         }
-        public async Task<List<Book>> GetByNameAsync(string name)
+        public async Task<List<Book>> GetBorrowBookAsync(string id)
         {
-            User user = await _userRepository.GetByNameAsync(name);
+            ObjectId userId = new ObjectId(id);
+            User user = await _userRepository.GetUserById(userId);
             var bookList = new List<Book>();
             var borrowBooksList = user.BorrowBooks.ToList();
             foreach (var book in borrowBooksList)
@@ -58,9 +59,10 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
            
             return bookList;
         }
-        public async Task<List<Book>> GetReadOutAsync(string name)
+        public async Task<List<Book>> GetReadOutAsync(string id)
         {
-            User user = await _userRepository.GetByNameAsync(name);
+            ObjectId userId = new ObjectId(id);
+            User user = await _userRepository.GetUserById(userId);
             var bookList2 = new List<Book>();
             var readOutBookList = user.ReadOutBooks.ToList();
             foreach (var book in readOutBookList)
