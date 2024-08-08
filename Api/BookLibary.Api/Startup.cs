@@ -8,6 +8,7 @@ using BookLibary.Api.Services.AuthServices.RegisterServices;
 using BookLibary.Api.Services.AuthServices.TokenHelperServices;
 using BookLibary.Api.Services.AuthServices.TokenServices;
 using BookLibary.Api.Services.AuthServices.UpdateServices;
+using BookLibary.Api.Services.AuthServices.EmailServices;
 using BookLibary.Api.Services.AuthServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -39,6 +40,7 @@ public class Startup
         services.AddScoped<IRepository<User>, MongoRepositoryBase<User>>();
         services.AddScoped<IRegisterRepository<User>, RegisterRepository>();
         services.AddScoped<IRegisterService, RegisterService>();
+        services.AddScoped<EmailService>();
 
         services.AddHttpContextAccessor();
         services.AddMemoryCache();
