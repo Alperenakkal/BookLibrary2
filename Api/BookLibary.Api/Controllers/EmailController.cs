@@ -9,9 +9,9 @@ namespace BookLibary.Api.Controllers
     [ApiController]
     public class ContactController : ControllerBase
     {
-        private readonly EmailService _emailService;
+        private readonly IEmailService _emailService;
 
-        public ContactController(EmailService emailService)
+        public ContactController(IEmailService emailService)
         {
             _emailService = emailService;
         }
