@@ -1,4 +1,5 @@
-﻿using BookLibary.Api.Dtos.UserDto;
+﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using BookLibary.Api.Dtos.UserDto;
 using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
 using System.Security.Cryptography;
@@ -40,11 +41,15 @@ namespace BookLibary.Api.Services.AuthServices.RegisterServices
             
 
             hashedPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(model.Password)));
-            var url = "https://avatar.iran.liara.run/public";
+            var url="";
             if (model.Gender == GenderType.Female)
             {
                 url = $"https://avatar.iran.liara.run/public/girl/?username={model.UserName}";
 
+            }
+            else if(model.Gender == GenderType.other)
+            {
+                url = "https://avatar.iran.liara.run/public";
             }
             else
             {

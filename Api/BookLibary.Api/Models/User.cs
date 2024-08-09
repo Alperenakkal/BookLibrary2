@@ -5,7 +5,8 @@ namespace BookLibary.Api.Models
 {
 
     public enum GenderType
-    {
+    {   
+        other,
         Male,
         Female
     }
