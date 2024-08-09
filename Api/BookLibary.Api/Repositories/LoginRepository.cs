@@ -52,6 +52,7 @@ namespace BookLibary.Api.Repositories
                 var update = Builders<User>.Update
           .Set(u => u.FullName, entity.FullName)
           .Set(u => u.UserName, entity.UserName)
+          .Set(u => u.Email, entity.Email)
           .Set(u => u.Password, entity.Password)
           .Set(u => u.BorrowBooks, entity.BorrowBooks)
           .Set(u => u.ReadOutBooks, entity.ReadOutBooks);
