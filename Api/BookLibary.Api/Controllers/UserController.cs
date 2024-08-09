@@ -59,9 +59,9 @@ namespace BookLibary.Api.Controllers
             _memoryCache.Remove("Bearer");
             return Ok(new { message = "User logged out successfully." });
         }
-        [HttpPut("UpdateUser")]
+        [HttpPut("UpdateUser/{userId}")]
 
-        public async Task<ActionResult<UpdateUserDto>> UpdateUserAsync([FromBody] UpdateUserDto model)
+        public async Task<ActionResult<UpdateUserDto>> UpdateUserAsync(string userId,[FromBody] UpdateUserDto model)
         {
             User user = new User
             {
@@ -73,7 +73,7 @@ namespace BookLibary.Api.Controllers
 
 
             };
-            var result = await _updateService.UpdateUserAsync(user);
+            var result = await _updateService.UpdateUserAsync(userId,user);
             return result;
         }
         [HttpGet("redis/{name}")]

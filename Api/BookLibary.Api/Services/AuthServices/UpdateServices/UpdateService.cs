@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson.IO;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 
 namespace BookLibary.Api.Services.AuthServices.UpdateServices
@@ -16,43 +18,46 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
     private readonly IUserRepository<User> _repository;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IMemoryCache _memoryCache;
+    private string hashedPassword;
 
-    public UpdateService(IUserRepository<User> repository, IHttpContextAccessor contextAccessor, IMemoryCache memoryCache)
+        public UpdateService(IUserRepository<User> repository, IHttpContextAccessor contextAccessor, IMemoryCache memoryCache)
     {
         _repository = repository;
         _contextAccessor = contextAccessor;
         _memoryCache = memoryCache;
     }
 
-    public async Task<UpdateUserDto> UpdateUserAsync(User user)
+    public async Task<UpdateUserDto> UpdateUserAsync(string userId,User model)
     {
         UpdateUserDto dto = new UpdateUserDto();
+            SHA1 sha = new SHA1CryptoServiceProvider();
 
-        var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
-        var redisToken = _memoryCache.Get("Bearer").ToString();
 
-        if (string.IsNullOrEmpty(redisToken))
-        {
-            throw new UnauthorizedAccessException("Token bulunamadı");
-        }
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var jwtToken = tokenHandler.ReadJwtToken(redisToken);
-        var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-
-        if (string.IsNullOrEmpty(userId))
+          
+            if (string.IsNullOrEmpty(userId))
         {
             throw new InvalidOperationException("User ID token'dan alınamadı");
         }
 
-        if (string.IsNullOrEmpty(user.UserName) && string.IsNullOrEmpty(user.Password))
+        if (string.IsNullOrEmpty(model.UserName) && string.IsNullOrEmpty(model.Password))
         {
-            throw new NullReferenceException(nameof(user));
+            throw new NullReferenceException(nameof(model));
         }
 
         try
         {
-            await _repository.UpdateUserAsync(userId, user);
+                hashedPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(model.Password)));
+                var user = new User
+                {
+                    UserName = model.UserName,
+                    FullName = model.FullName,
+                    Email = model.Email,
+                    Password = hashedPassword,
+                    IsAdmin = false,
+
+                };
+                await _repository.UpdateUserAsync(userId, user);
 
             dto.UserName = user.UserName;
             dto.FullName = user.FullName;
