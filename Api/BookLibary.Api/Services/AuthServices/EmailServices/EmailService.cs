@@ -46,13 +46,8 @@ namespace BookLibary.Api.Services.AuthServices.EmailServices
             {
                 From = new MailAddress(Email.EmailAddress),
                 Subject = "Book Library Destek ",
-                Body = $@"
-                    Name: {Email.Name}
-                    Email: {Email.EmailAddress}
-                    Phone: {Email.Phone}
-                    Message: {Email.Message}
-                ",
-                IsBodyHtml = false,
+                Body = Email.HtmlContent,
+                IsBodyHtml = true,
             };
 
 
