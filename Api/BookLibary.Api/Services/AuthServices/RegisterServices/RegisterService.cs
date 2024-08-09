@@ -3,6 +3,7 @@ using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
 using System.Security.Cryptography;
 using System.Text;
+using static System.Net.WebRequestMethods;
 
 namespace BookLibary.Api.Services.AuthServices.RegisterServices
 {
@@ -39,6 +40,17 @@ namespace BookLibary.Api.Services.AuthServices.RegisterServices
             
 
             hashedPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(model.Password)));
+            var url = "https://avatar.iran.liara.run/public";
+            if (model.Gender == GenderType.Female)
+            {
+                url = $"https://avatar.iran.liara.run/public/girl/?username={model.UserName}";
+
+            }
+            else
+            {
+                url = $"https://avatar.iran.liara.run/public/boy/?username={model.UserName}";
+
+            }
 
 
             var user = new User
@@ -47,7 +59,9 @@ namespace BookLibary.Api.Services.AuthServices.RegisterServices
                 FullName = model.FullName,
                 Email = model.Email,
                 Password = hashedPassword,
-                IsAdmin=false,
+                gender = model.Gender,
+                avatarUrl = url,
+                IsAdmin =false,
 
             };
 
