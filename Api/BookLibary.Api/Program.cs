@@ -1,4 +1,8 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using BookLibary.Api.Configurations;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
 
 // Startup sınıfını kullanarak uygulama yapılandırmasını başlat
 builder.Host.ConfigureAppConfiguration((context, config) =>
