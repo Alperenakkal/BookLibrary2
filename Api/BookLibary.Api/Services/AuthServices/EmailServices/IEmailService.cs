@@ -6,6 +6,7 @@ namespace BookLibary.Api.Services.AuthServices.EmailServices
     public interface IEmailService
     {
         Task SendEmailAsync(Email Email);
-        
-        }
+        Task SendVerifyEmailAsync(Email Email);
+
+    }
 }

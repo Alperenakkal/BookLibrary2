@@ -25,5 +25,14 @@ namespace BookLibary.Api.Controllers
             await _emailService.SendEmailAsync(emailModel);
             return Ok("Email sent successfully.");
         }
+        [HttpPost("sendverify-email")]
+        public async Task<IActionResult> SendVerifyEmail([FromBody] Email emailModel)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _emailService.SendVerifyEmailAsync(emailModel);
+            return Ok("Email sent successfully.");
+        }
     }
 }
