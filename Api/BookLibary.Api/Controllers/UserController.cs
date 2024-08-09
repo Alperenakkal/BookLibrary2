@@ -63,17 +63,8 @@ namespace BookLibary.Api.Controllers
 
         public async Task<ActionResult<UpdateUserDto>> UpdateUserAsync(string userId,[FromBody] UpdateUserDto model)
         {
-            User user = new User
-            {
-                UserName = model.UserName,
-                Email = model.Email,
-                Password = model.Password,
-                FullName = model.FullName,
-                IsAdmin = false,
-
-
-            };
-            var result = await _updateService.UpdateUserAsync(userId,user);
+        
+            var result = await _updateService.UpdateUserAsync(userId,model);
             return result;
         }
         [HttpGet("redis/{name}")]

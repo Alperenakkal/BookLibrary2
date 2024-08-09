@@ -27,7 +27,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
         _memoryCache = memoryCache;
     }
 
-    public async Task<UpdateUserDto> UpdateUserAsync(string userId,User model)
+    public async Task<UpdateUserDto> UpdateUserAsync(string userId,UpdateUserDto model)
     {
         UpdateUserDto dto = new UpdateUserDto();
             SHA1 sha = new SHA1CryptoServiceProvider();
@@ -44,8 +44,19 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
         {
             throw new NullReferenceException(nameof(model));
         }
+            var url = "https://avatar.iran.liara.run/public";
+            if (model.Gender == GenderType.Female)
+            {
+                url = $"https://avatar.iran.liara.run/public/girl/?username={model.UserName}";
 
-        try
+            }
+            else
+            {
+                url = $"https://avatar.iran.liara.run/public/boy/?username={model.UserName}";
+
+            }
+
+            try
         {
                 hashedPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(model.Password)));
                 var user = new User
@@ -54,6 +65,8 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
                     FullName = model.FullName,
                     Email = model.Email,
                     Password = hashedPassword,
+                    gender =model.Gender,
+                    avatarUrl=url,
                     IsAdmin = false,
 
                 };

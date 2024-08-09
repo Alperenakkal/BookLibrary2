@@ -7,7 +7,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
 	public interface IUpdateService
 	{
 
-		Task<UpdateUserDto> UpdateUserAsync(string userId, User user);
+		Task<UpdateUserDto> UpdateUserAsync(string userId, UpdateUserDto user);
       
     }
 }
