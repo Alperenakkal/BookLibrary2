@@ -18,7 +18,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
     private readonly IUserRepository<User> _repository;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IMemoryCache _memoryCache;
-    private string hashedPassword;
+
 
         public UpdateService(IUserRepository<User> repository, IHttpContextAccessor contextAccessor, IMemoryCache memoryCache)
     {
@@ -40,10 +40,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
             throw new InvalidOperationException("User ID token'dan alınamadı");
         }
 
-        if (string.IsNullOrEmpty(model.UserName) && string.IsNullOrEmpty(model.Password))
-        {
-            throw new NullReferenceException(nameof(model));
-        }
+  
             var url = "https://avatar.iran.liara.run/public";
             if (model.Gender == GenderType.Female)
             {
@@ -58,13 +55,13 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
 
             try
         {
-                hashedPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(model.Password)));
+           
                 var user = new User
                 {
                     UserName = model.UserName,
                     FullName = model.FullName,
                     Email = model.Email,
-                    Password = hashedPassword,
+          
                     gender =model.Gender,
                     avatarUrl=url,
                     IsAdmin = false,
@@ -75,10 +72,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
             dto.UserName = user.UserName;
             dto.FullName = user.FullName;
             dto.Email = user.Email;
-            if (!string.IsNullOrEmpty(user.Password))
-            {
-                dto.Password = "Şifre başarılı bir şekilde değiştirildi";
-            }
+          
             return dto;
         }
         catch (Exception ex)
