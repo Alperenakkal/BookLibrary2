@@ -1,6 +1,11 @@
-﻿namespace BookLibary.Api.Services.AuthServices.EmailServices
+﻿using BookLibary.Api.Models;
+using Org.BouncyCastle.Asn1.Pkcs;
+
+namespace BookLibary.Api.Services.AuthServices.EmailServices
 {
-    public class IEmailService
+    public interface IEmailService
     {
-    }
+        Task SendEmailAsync(Email Email);
+        
+        }
 }

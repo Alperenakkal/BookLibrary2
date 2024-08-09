@@ -40,8 +40,7 @@ public class Startup
         services.AddScoped<IRepository<User>, MongoRepositoryBase<User>>();
         services.AddScoped<IRegisterRepository<User>, RegisterRepository>();
         services.AddScoped<IRegisterService, RegisterService>();
-        services.AddScoped<EmailService>();
-
+        services.AddScoped<IEmailService, EmailService>();
         services.AddHttpContextAccessor();
         services.AddMemoryCache();
 
