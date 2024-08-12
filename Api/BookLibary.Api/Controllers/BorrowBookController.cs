@@ -54,7 +54,7 @@ namespace BookLibary.Api.Controllers
             
            
             await _borrowService.AddBorrowedBookAsync(bookIdR,id);
-            return Ok("Kitap başarıyla ödünç alındı.");
+            return Ok("Kitap basariyla odunc alindi.");
             
             
             
