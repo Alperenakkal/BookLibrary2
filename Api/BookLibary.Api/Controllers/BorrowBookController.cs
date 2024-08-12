@@ -54,11 +54,11 @@ namespace BookLibary.Api.Controllers
             
            
             await _borrowService.AddBorrowedBookAsync(bookIdR,id);
-            return Ok();
-            
-            
-            
-            
+            return Ok(new { message = "Eklendi " });
+
+
+
+
         }
         [HttpDelete("RemoveBorrowed")]
         public async Task<IActionResult> RemoveBorrowedBookAsync([FromBody] BarrowBookIdDto bookIdR, string userId)
