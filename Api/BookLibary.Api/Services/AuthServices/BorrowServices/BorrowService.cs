@@ -178,15 +178,18 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             }
         }
 
-            public async Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR){
-            
-            var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
-            var redisToken = _memoryCache.Get("Bearer").ToString();
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(redisToken);
-             
-            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-            var user = await GetByIdAsync(userId);
+            public async Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR, string id){
+
+            //  var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            //// var redisToken = _memoryCache.Get("Bearer").ToString();
+            // var tokenHandler = new JwtSecurityTokenHandler();
+            // var jwtToken = tokenHandler.ReadJwtToken(redisToken);
+
+            // var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            ObjectId userId = new ObjectId(id);
+            User user = await _userRepository.GetUserById(userId);
+
+       //     var user = await GetByIdAsync(id);
             ObjectId bookIdr = new ObjectId(bookIdR.Id);
             
             if (user.BorrowBooks.Contains(bookIdr))
@@ -195,9 +198,12 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             }
             return true;
         }
-            public async Task AddtoReadoutBookAsync(BarrowBookIdDto bookId, string userId)
+            public async Task AddtoReadoutBookAsync(BarrowBookIdDto bookId, string id)
             {
-                var user = await GetByIdAsync(userId); // Find user by ID
+            ObjectId userId = new ObjectId(id);
+            User user = await _userRepository.GetUserById(userId);
+
+           // var user = await GetByIdAsync(userId); // Find user by ID
                 if (user == null)
                 {
                     throw new KeyNotFoundException("Kullanıcı bulunamadı."); // User not found

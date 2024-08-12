@@ -54,7 +54,9 @@ namespace BookLibary.Api.Repositories
           .Set(u => u.UserName, entity.UserName)
           .Set(u => u.Email, entity.Email)
             .Set(u => u.gender, entity.gender)
-           .Set(u => u.avatarUrl, entity.avatarUrl);
+           .Set(u => u.avatarUrl, entity.avatarUrl)
+           .Set(u => u.ReadOutBooks, entity.ReadOutBooks)
+           .Set(u => u.BorrowBooks, entity.BorrowBooks);
       
 
 
