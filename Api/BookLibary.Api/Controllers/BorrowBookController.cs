@@ -66,7 +66,7 @@ namespace BookLibary.Api.Controllers
            // var userId = await _tokenHelperService.GetIdFromToken();
             await _borrowService.RemoveBookAsync(userId, bookIdR);
 
-            return Ok("Kitap başarıyla geri verildi.");
+            return Ok(new { message = "Kitap geri verildi " });
 
         }
 
