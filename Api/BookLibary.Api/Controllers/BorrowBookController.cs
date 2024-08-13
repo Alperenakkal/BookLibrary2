@@ -60,17 +60,15 @@ namespace BookLibary.Api.Controllers
 
 
         }
-        [HttpDelete("RemoveBorrowed")]
+        [HttpDelete("RemoveBorrowed/{userId}")]
         public async Task<IActionResult> RemoveBorrowedBookAsync([FromBody] BarrowBookIdDto bookIdR, string userId)
         {
-           // var userId = await _tokenHelperService.GetIdFromToken();
             await _borrowService.RemoveBookAsync(userId, bookIdR);
-
             return Ok(new { message = "Kitap geri verildi " });
-
         }
 
-         [HttpPut("UpdateBorrowedBook")]
+
+        [HttpPut("UpdateBorrowedBook")]
          public async Task<IActionResult> UpdateBook([FromBody] BarrowBookIdDto bookId, string id)
          {
 
