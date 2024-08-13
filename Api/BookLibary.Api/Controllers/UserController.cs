@@ -34,6 +34,15 @@ namespace BookLibary.Api.Controllers
             if (username == null) { return NotFound("Kullanıcı bulunamadi"); }
             return Ok(username);
         }
+        [HttpGet("GetByEmail/{mail}")]
+        public async Task <IActionResult> GetByEmail(string mail)
+        {
+            User email = await _service.GetByEmailAsync(mail);
+            if (email == null) { return NotFound("Bu email adresine ait kullanici bulunamadi"); };
+            return Ok(email);
+                    
+        }
+
         [HttpPost]
         public async Task<IActionResult> Login([FromBody]LoginDto model)
         {
@@ -57,7 +66,7 @@ namespace BookLibary.Api.Controllers
         {
             await _service.LogoutUserAsync();
             _memoryCache.Remove("Bearer");
-            return Ok(new { message = "User logged out successfully." });
+            return Ok(new { message = "Kullanici cikisi basarili" });
         }
         [HttpPut("UpdateUser/{userId}")]
 

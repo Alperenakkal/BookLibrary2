@@ -6,6 +6,7 @@ namespace BookLibary.Api.Repositories
     public interface IUserRepository<TEntity> where TEntity : class
     {
         Task<TEntity> GetByNameAsync(string userName);
+        Task<TEntity> GetByEmailAsync(string email);
         Task<User> UpdateUserAsync(object id, User entity);
         Task<TEntity> GetUserById(Object  _id);
         Task<User> RemoveBookFromUserAsync(object userId, ObjectId bookId);
