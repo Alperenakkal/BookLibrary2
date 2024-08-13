@@ -28,19 +28,21 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
 
         public async Task<User> GetByNameAsync(string name)
         {
-          
-
             User user = await _repository.GetByNameAsync(name); 
             return user;
         }
+        public async Task<User> GetByEmailAsync(string email)
+        {
+            User user = await _repository.GetByEmailAsync(email);
+            return user;
+        }
+        
 
         public async Task<LoginResponse> LoginUserAsync(LoginRequest request)
            
         {
             LoginResponse response = new LoginResponse();
-
             User user = await _repository.GetByNameAsync(request.Username);
-            // hash 
             SHA1 sha = new SHA1CryptoServiceProvider();
             hashPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(request.Password)));
 
@@ -58,8 +60,6 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
                 return response;
             }
             
-
-            // control hash password
             if (user.Password == hashPassword)
             {
                 var generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = user.Id.ToString() });
