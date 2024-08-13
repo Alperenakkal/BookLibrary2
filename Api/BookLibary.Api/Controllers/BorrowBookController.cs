@@ -63,11 +63,16 @@ namespace BookLibary.Api.Controllers
         [HttpDelete("RemoveBorrowed/{userId}")]
         public async Task<IActionResult> RemoveBorrowedBookAsync([FromBody] BarrowBookIdDto bookIdR, string userId)
         {
-            // Gelen Id alanını düzgün işleyin
-            ObjectId bookId = new ObjectId(bookIdR.Id); // Eğer ObjectId bekliyorsanız
+            // Gelen JSON verisini `BarrowBookIdDto` nesnesine çevirin
+            if (bookIdR == null || string.IsNullOrEmpty(bookIdR.Id))
+            {
+                return BadRequest(new { message = "Book ID is required" });
+            }
+
             await _borrowService.RemoveBookAsync(userId, bookIdR);
-            return Ok(new { message = "Kitap geri verildi " });
+            return Ok(new { message = "Kitap geri verildi" });
         }
+
 
 
 
