@@ -34,7 +34,7 @@ namespace BookLibary.Api.Controllers
             if (username == null) { return NotFound("Kullanıcı bulunamadi"); }
             return Ok(username);
         }
-        [HttpGet("{email}")]
+        [HttpGet("GetByEmail/{mail}")]
         public async Task <IActionResult> GetByEmail(string mail)
         {
             User email = await _service.GetByEmailAsync(mail);
