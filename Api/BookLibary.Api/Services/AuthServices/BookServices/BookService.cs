@@ -34,6 +34,10 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
         {
             return await _bookRepository.GetByIdAsync(id);
         }
+        public async Task<Book> GetByNameAsync(string name)
+        {
+            return await _bookRepository.GetByNameAsync(name);
+        }
 
         // public Task<GetOneResult<Book>> UpdateBookAsync(string id, Book book)
         // {

@@ -5,7 +5,8 @@ namespace BookLibary.Api.Repositories{
      {
 
         Task<T> GetByIdAsync(string _id);
-         Task<T> InsertOneAsync(Book book);
+        Task<T> GetByNameAsync(string name);
+        Task<T> InsertOneAsync(Book book);
          Task<GetManyResult<Book>> GetAllAsync();
          Task<GetOneResult<Book>> DeleteByNameAsync(string bookName);
     } 

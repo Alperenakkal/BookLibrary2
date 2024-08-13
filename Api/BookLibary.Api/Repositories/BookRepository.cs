@@ -91,6 +91,20 @@ using BookLibary.Api.Models;
                 throw new Exception("Id getirme işlemi başarısız");
             }
         }
+        public async Task<Book> GetByNameAsync(string name)
+        {
+            try
+            {
+                var filter = Builders<Book>.Filter.Eq(x => x.BookName, name);
+                return await _collection.Find(filter).FirstOrDefaultAsync();
+            }
+            catch (Exception)
+            {
+
+                throw new Exception("Book Not found");
+            }
+        }
+
 
       
     }

@@ -42,6 +42,12 @@ namespace BookLibary.Api.Controllers
             }
             return Ok(result);
         }
+        [HttpGet("Name/{name}")]
+        public async Task<IActionResult> GetByName(string name)
+        {
+            var result = await _bookService.GetByNameAsync(name);
+            return Ok(result);
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateBook([FromBody] Book book)
