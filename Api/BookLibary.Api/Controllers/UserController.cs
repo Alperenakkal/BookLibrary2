@@ -88,6 +88,14 @@ namespace BookLibary.Api.Controllers
             return _memoryCache.Get<string>("Bearer");
 
         }
+        [HttpPut("UpdatePassword/{userId}")]
+        public async Task<ActionResult<UpdateUserDto>> UpdatePassword(string userId, string password)
+        {
+            UpdateUserDto user = await _updateService.UpdatePassword(userId, password);
+            return Ok(user);
+
+
+        }
 
 
     }

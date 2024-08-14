@@ -26,6 +26,26 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
         _contextAccessor = contextAccessor;
         _memoryCache = memoryCache;
     }
+    public async Task<UpdateUserDto> UpdatePassword(string id, string password)
+    {
+            try
+            {
+                var user = await _repository.UpdatePassword(id, password);
+                UpdateUserDto userDto = new UpdateUserDto
+                {
+                    Email = user.Email,
+                    FullName= user.FullName,
+                    UserName = user.UserName,
+                    Gender =user.gender,
+                };
+                return userDto;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("Kullanici sifre islemi basarisiz",ex);
+            }
+    }
 
     public async Task<UpdateUserDto> UpdateUserAsync(string userId,UpdateUserDto model)
     {
