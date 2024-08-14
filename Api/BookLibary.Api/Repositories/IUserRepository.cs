@@ -1,4 +1,5 @@
 ﻿using BookLibary.Api.Models;
+using BookLibary.Api.Models.Request.UserRequest;
 using MongoDB.Bson;
 
 namespace BookLibary.Api.Repositories
@@ -7,7 +8,7 @@ namespace BookLibary.Api.Repositories
     {
         Task<TEntity> GetByNameAsync(string userName);
         Task<TEntity> GetByEmailAsync(string email);
-        Task<TEntity> UpdatePassword(string name ,string password);
+        Task<TEntity> UpdatePassword(string name ,updatePasswordRequest password);
         Task<TEntity> UpdateUserAsync(object id, User entity);
 
         Task<TEntity> GetUserById(Object  _id);

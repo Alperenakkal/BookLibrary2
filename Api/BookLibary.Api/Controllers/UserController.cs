@@ -89,7 +89,7 @@ namespace BookLibary.Api.Controllers
 
         }
         [HttpPut("UpdatePassword/{name}")]
-        public async Task<ActionResult<UpdateUserDto>> UpdatePassword(string name, string password)
+        public async Task<ActionResult<UpdateUserDto>> UpdatePassword(string name, updatePasswordRequest password)
         {
             UpdateUserDto user = await _updateService.UpdatePassword(name, password);
             return Ok(user);

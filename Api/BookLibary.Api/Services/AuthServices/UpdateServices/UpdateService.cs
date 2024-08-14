@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using BookLibary.Api.Dtos.UserDto;
 using BookLibary.Api.Models;
+using BookLibary.Api.Models.Request.UserRequest;
 using BookLibary.Api.Models.Response.UserResponse;
 using BookLibary.Api.Repositories;
 using Microsoft.AspNetCore.Authentication;
@@ -26,7 +27,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
         _contextAccessor = contextAccessor;
         _memoryCache = memoryCache;
     }
-    public async Task<UpdateUserDto> UpdatePassword(string name, string password)
+    public async Task<UpdateUserDto> UpdatePassword(string name, updatePasswordRequest password)
     {
             try
             {

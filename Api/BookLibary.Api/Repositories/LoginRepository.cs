@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using BookLibary.Api.Models.Request.UserRequest;
 
 namespace BookLibary.Api.Repositories
 {
@@ -68,7 +69,7 @@ namespace BookLibary.Api.Repositories
             }
         }
 
-       public async Task<User> UpdatePassword(string name , string  password)
+       public async Task<User> UpdatePassword(string name , updatePasswordRequest  password)
         {
             try
             {
