@@ -63,27 +63,38 @@ namespace BookLibary.Api.Controllers
         [HttpDelete("RemoveBorrowed/{userId}")]
         public async Task<IActionResult> RemoveBorrowedBookAsync([FromBody] BarrowBookIdDto bookIdR, string userId)
         {
-            // Gelen Id alanını düzgün işleyin
-            ObjectId bookId = new ObjectId(bookIdR.Id); // Eğer ObjectId bekliyorsanız
+            // Gelen JSON verisini `BarrowBookIdDto` nesnesine çevirin
+            if (bookIdR == null || string.IsNullOrEmpty(bookIdR.Id))
+            {
+                return BadRequest(new { message = "Book ID is required" });
+            }
+
             await _borrowService.RemoveBookAsync(userId, bookIdR);
-            return Ok(new { message = "Kitap geri verildi " });
+            return Ok(new { message = "Kitap geri verildi" });
         }
+
 
 
 
         [HttpPut("UpdateBorrowedBook")]
          public async Task<IActionResult> UpdateBook([FromBody] BarrowBookIdDto bookId, string id)
          {
+            try
+            {
+                await _borrowService.AddtoReadoutBookAsync(bookId, id);
+                return Ok("Kitap Okunmuş Listenize Eklendi");
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = new
+                {
+                    Message = "Internal server error",
+                    Detail = ex.Message
+                };
+                return StatusCode(500, errorResponse);
+            }
+        }
 
-            // var userId = await _tokenHelperService.GetIdFromToken();
-             await _borrowService.AddtoReadoutBookAsync(bookId,id);
-
-
-
-
-            
-             return Ok("Kitap Okunmuş Listenize Eklendi");
-         }
          [HttpGet("GetReadOutByName")]
         public async Task<IActionResult> GetReadoutBookByNameAsync(string id)
         {
@@ -98,6 +109,7 @@ namespace BookLibary.Api.Controllers
 
             return Ok(result);
         }
+
         [HttpGet("user/{id}")]
         public async Task<IActionResult> IdGetUser(string id)
         {
