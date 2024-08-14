@@ -7,7 +7,10 @@ using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
+using BookLibary.Api.Models.Request.UserRequest;
 
 namespace BookLibary.Api.Repositories
 {
@@ -15,6 +18,7 @@ namespace BookLibary.Api.Repositories
     {
         private readonly MongoDbContext _context;
         private readonly IMongoCollection<User> _model;
+        private string hashedPassword;
 
         public LoginRepository(MongoDbContext context)
         {
@@ -66,6 +70,32 @@ namespace BookLibary.Api.Repositories
             }
         }
 
+       public async Task<User> UpdatePassword(string name , updatePasswordRequest  password)
+        {
+            try
+            {
+              
+                SHA1 sha = new SHA1CryptoServiceProvider();
+                hashedPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(password.Password)));
+                var filter = Builders<User>.Filter.Eq(u => u.UserName,name);
+                var update = Builders<User>.Update.Set(u=> u.Password , hashedPassword);
+                var updatedUser= await _model.FindOneAndUpdateAsync(
+                    filter, 
+                    update,
+                    new FindOneAndUpdateOptions<User>
+                    {
+                        ReturnDocument=ReturnDocument.After
+                    }
+                );
+                return updatedUser;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("Password update failed",ex);
+            }
+        }
 
 
         public async Task<User> UpdateUserAsync(object id, User entity)

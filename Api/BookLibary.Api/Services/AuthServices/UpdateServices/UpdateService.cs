@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using BookLibary.Api.Dtos.UserDto;
 using BookLibary.Api.Models;
+using BookLibary.Api.Models.Request.UserRequest;
 using BookLibary.Api.Models.Response.UserResponse;
 using BookLibary.Api.Repositories;
 using Microsoft.AspNetCore.Authentication;
@@ -25,6 +26,26 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
         _repository = repository;
         _contextAccessor = contextAccessor;
         _memoryCache = memoryCache;
+    }
+    public async Task<UpdateUserDto> UpdatePassword(string name, updatePasswordRequest password)
+    {
+            try
+            {
+                var user = await _repository.UpdatePassword(name, password);
+                UpdateUserDto userDto = new UpdateUserDto
+                {
+                    Email = user.Email,
+                    FullName= user.FullName,
+                    UserName = user.UserName,
+                    Gender =user.gender,
+                };
+                return userDto;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("Kullanici sifre islemi basarisiz",ex);
+            }
     }
 
     public async Task<UpdateUserDto> UpdateUserAsync(string userId,UpdateUserDto model)
