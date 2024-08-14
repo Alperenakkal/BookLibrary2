@@ -86,10 +86,14 @@ namespace BookLibary.Api.Controllers
             }
             catch (Exception ex)
             {
-                // Detaylı hata mesajı ile geri dönün
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                var errorResponse = new
+                {
+                    Message = "Internal server error",
+                    Detail = ex.Message
+                };
+                return StatusCode(500, errorResponse);
             }
-         }
+        }
 
          [HttpGet("GetReadOutByName")]
         public async Task<IActionResult> GetReadoutBookByNameAsync(string id)
