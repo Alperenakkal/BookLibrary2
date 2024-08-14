@@ -251,52 +251,25 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                     BorrowBooks = borrowBooksList
                 };
 
-                try
-                {
-                    var updateResult = await _userRepository.UpdateUserAsync(user.Id, userResponse);
-                    Console.WriteLine("Okunan kitap listesi güncellendi.");
-                }
-                catch (Exception ex)
-                {
-                    // Daha fazla detay sağlayan bir hata mesajı ekleyin
-                    Console.WriteLine($"Güncelleme işlemi başarısız: {ex.Message}");
-                    throw new Exception("Güncelleme işlemi başarısız", ex);
-                }
+                  try
+                   {
+                       var updateResult = await _userRepository.UpdateUserAsync(user.Id, userResponse);
 
-
-
-
-
-
-
-
-
-
-                //eskisi
-                //   try
-                //    {
-                //        var updateResult = await _userRepository.UpdateUserAsync(user.Id, userResponse);
-
-                //        Console.WriteLine("Okunan kitap listesi güncellendi.");
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        throw new Exception("Güncelleme işlemi başarısız", ex);
-                //    }
-                //}
-                //else
-                //{
-                //    throw new InvalidOperationException("Kitap kullanıcı tarafından ödünç alınmamış.");
-                //}
-
+                       Console.WriteLine("Okunan kitap listesi güncellendi.");
+                    }
+                    catch (Exception ex)
+                    {
+                       throw new Exception("Güncelleme işlemi başarısız", ex);
+                    }
             }
-
-
-
+                else
+                {
+                    throw new InvalidOperationException("Kitap kullanıcı tarafından ödünç alınmamış.");
+                } 
         }
     }
-
-}    
+}
+ 
         
     
  

@@ -87,7 +87,7 @@ namespace BookLibary.Api.Controllers
 
 
             
-             return Ok("Kitap Okunmuş Listenize Eklendi");
+             return Ok(new { message = "Kitap okunmuş listesine eklendi" });
          }
          [HttpGet("GetReadOutByName")]
         public async Task<IActionResult> GetReadoutBookByNameAsync(string id)
