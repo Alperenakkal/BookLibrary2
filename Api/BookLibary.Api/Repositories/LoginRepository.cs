@@ -73,8 +73,9 @@ namespace BookLibary.Api.Repositories
         {
             try
             {
+              
                 SHA1 sha = new SHA1CryptoServiceProvider();
-                hashedPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(password)));
+                hashedPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(password.Password)));
                 var filter = Builders<User>.Filter.Eq(u => u.UserName,name);
                 var update = Builders<User>.Update.Set(u=> u.Password , hashedPassword);
                 var updatedUser= await _model.FindOneAndUpdateAsync(
