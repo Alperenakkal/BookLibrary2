@@ -1,4 +1,5 @@
-﻿using BookLibary.Api.Models;
+﻿using BookLibary.Api.Dtos.BookDto;
+using BookLibary.Api.Models;
 using MongoDB.Bson;
 
 namespace BookLibary.Api.Repositories
@@ -9,6 +10,6 @@ namespace BookLibary.Api.Repositories
         Task<TEntity> GetByEmailAsync(string email);
         Task<User> UpdateUserAsync(object id, User entity);
         Task<TEntity> GetUserById(Object  _id);
-        Task<User> RemoveBookFromUserAsync(object userId, ObjectId bookId);
+        Task<User> RemoveBookFromUserAsync(BorrowBookByNameDto bookDto, string userName);
     }
 }

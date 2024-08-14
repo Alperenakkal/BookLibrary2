@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace BookLibary.Api.Services.AuthServices.BorrowServices
@@ -34,15 +35,15 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             _updateService = updateService;
 
         }
-        public async Task<List<Book>> GetBorrowBookAsync(string id)
+        public async Task<List<Book>> GetBorrowBookAsync(string userName)
         {
-            ObjectId userId = new ObjectId(id);
-            User user = await _userRepository.GetUserById(userId);
+          //  ObjectId userId = new ObjectId(id);
+            User user = await _userRepository.GetByNameAsync(userName);
             var bookList = new List<Book>();
             var borrowBooksList = user.BorrowBooks.ToList();
             foreach (var book in borrowBooksList)
             {
-                var book1 = await _bookRepository.GetByIdAsync(book.ToString());
+                var book1 = await _bookRepository.GetByNameAsync(book.ToString());
                 if (book1 != null)
                 {
                     var bookResponse = new Book
@@ -59,15 +60,15 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
 
             return bookList;
         }
-        public async Task<List<Book>> GetReadOutAsync(string id)
+        public async Task<List<Book>> GetReadOutAsync(string userName)
         {
-            ObjectId userId = new ObjectId(id);
-            User user = await _userRepository.GetUserById(userId);
+           // ObjectId userId = new ObjectId(id);
+            User user = await _userRepository.GetByNameAsync(userName);
             var bookList2 = new List<Book>();
             var readOutBookList = user.ReadOutBooks.ToList();
             foreach (var book in readOutBookList)
             {
-                var book1 = await _bookRepository.GetByIdAsync(book.ToString());
+                var book1 = await _bookRepository.GetByNameAsync(book);
                 if (book1 != null)
                 {
                     var bookResponse2 = new Book
@@ -112,11 +113,12 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             }
             return await _repository.ReplaceOneAsync(user, id.ToString());
         }
-        public async Task<User> RemoveBookAsync(string userId, BarrowBookIdDto bookIdR)
+        public async Task<User> RemoveBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
-            ObjectId id = new ObjectId(userId);
-            ObjectId bookId = new ObjectId(bookIdR.Id);
-            var user = await _userRepository.RemoveBookFromUserAsync(userId, bookId);
+            //    ObjectId id = new ObjectId(userId);
+            //   ObjectId bookId = new ObjectId(bookIdR.Id);
+      
+            var user = await _userRepository.RemoveBookFromUserAsync(bookDto,userName);
 
 
             if (user == null)
@@ -126,10 +128,10 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             return user;
             ;
         }
-        public async Task AddBorrowedBookAsync(BarrowBookIdDto bookId, string userId)
+        public async Task AddBorrowedBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
 
-            var user = await GetByIdAsync(userId); // Kullanıcıyı ID'ye göre buluyoruz
+            var user = await _userRepository.GetByNameAsync(userName); // Kullanıcıyı ID'ye göre buluyoruz
 
             if (user == null)
             {
@@ -137,21 +139,15 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             }
 
             // Kitap ID'sini ObjectId'ye dönüştürüyoruz
-            ObjectId bookIdR;
-            try
-            {
-                bookIdR = new ObjectId(bookId.Id);
-            }
-            catch (FormatException)
-            {
-                throw new ArgumentException("Geçersiz kitap ID'si");
-            }
+           // ObjectId bookIdR;
+      
+         var bookName = bookDto.bookName;
 
-            if (!user.BorrowBooks.Contains(bookIdR))
+            if (!user.BorrowBooks.Contains(bookName))
             {
 
                 var borrowBooksList = user.BorrowBooks.ToList();
-                borrowBooksList.Add(bookIdR);
+                borrowBooksList.Add(bookName);
 
 
                 var userResponse = new User
@@ -176,13 +172,13 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromDays(30));
-                    await RemoveBookAsync(userId, bookId);
+                    await RemoveBookAsync(bookDto, userName);
 
                 });
             }
         }
 
-        public async Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR, string id)
+        public async Task<bool> IsBookAvailableAsync(BorrowBookByNameDto bookDto, string userName)
         {
 
             //  var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
@@ -191,53 +187,46 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             // var jwtToken = tokenHandler.ReadJwtToken(redisToken);
 
             // var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-            ObjectId userId = new ObjectId(id);
-            User user = await _userRepository.GetUserById(userId);
+           // ObjectId userId = new ObjectId(id);
+            User user = await _userRepository.GetByNameAsync(userName);
 
             //     var user = await GetByIdAsync(id);
-            ObjectId bookIdr = new ObjectId(bookIdR.Id);
-
-            if (user.BorrowBooks.Contains(bookIdr))
+          // ObjectId bookIdr = new ObjectId(bookIdR.Id);
+          var bookName = bookDto.bookName;
+            if (user.BorrowBooks.Contains(bookName))
             {
                 throw new Exception("Kitap önceden ödünç alınmış");
             }
             return true;
         }
-        public async Task AddtoReadoutBookAsync(BarrowBookIdDto bookId, string id)
+        public async Task AddtoReadoutBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
-            ObjectId userId = new ObjectId(id);
-            User user = await _userRepository.GetUserById(userId);
+            // Kullanıcıyı kullanıcı adıyla bul
+            User user = await _userRepository.GetByNameAsync(userName);
 
-            // var user = await GetByIdAsync(userId); // Find user by ID
             if (user == null)
             {
                 throw new KeyNotFoundException("Kullanıcı bulunamadı."); // User not found
             }
-            ObjectId bookIdR;
-            try
-            {
-                bookIdR = new ObjectId(bookId.Id);
-            }
-            catch (FormatException)
-            {
-                throw new ArgumentException("Geçersiz kitap ID'si"); // Invalid book ID
-            }
 
-            if (user.BorrowBooks.Contains(bookIdR))
+            // Kitap adını DTO'dan al
+            var bookName = bookDto.bookName;
+
+            // Kullanıcının ödünç aldığı kitaplar arasında bu kitap var mı kontrol et
+            if (user.BorrowBooks.Contains(bookName))
             {
                 var borrowBooksList = user.BorrowBooks.ToList();
                 var readOutBooksList = user.ReadOutBooks.ToList();
 
-                // Remove the book from the borrow list and add it to the readout list
-                borrowBooksList.Remove(bookIdR);
-                readOutBooksList.Add(bookIdR);
+                // Kitabı ödünç alınanlardan çıkar ve okunan kitaplara ekle
+                borrowBooksList.Remove(bookName);
+                readOutBooksList.Add(bookName);
 
-                // Update the user object
+                // Kullanıcı nesnesini güncelle
                 user.BorrowBooks = borrowBooksList;
                 user.ReadOutBooks = readOutBooksList;
 
-                // Update the user in the database
-
+                // Kullanıcıyı veritabanında güncellemek için yeni kullanıcı nesnesi oluştur
                 var userResponse = new User
                 {
                     Id = user.Id,
@@ -246,27 +235,28 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                     Email = user.Email,
                     gender = user.gender,
                     avatarUrl = user.avatarUrl,
-                    ReadOutBooks = user.ReadOutBooks,
+                    ReadOutBooks = readOutBooksList,
                     Password = user.Password,
                     BorrowBooks = borrowBooksList
                 };
 
-                  try
-                   {
-                       var updateResult = await _userRepository.UpdateUserAsync(user.Id, userResponse);
-
-                       Console.WriteLine("Okunan kitap listesi güncellendi.");
-                    }
-                    catch (Exception ex)
-                    {
-                       throw new Exception("Güncelleme işlemi başarısız", ex);
-                    }
-            }
-                else
+                try
                 {
-                    throw new InvalidOperationException("Kitap kullanıcı tarafından ödünç alınmamış.");
-                } 
+                    var updateResult = await _userRepository.UpdateUserAsync(user.Id, userResponse);
+                    Console.WriteLine("Okunan kitap listesi güncellendi.");
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Güncelleme işlemi başarısız", ex);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Kitap kullanıcı tarafından ödünç alınmamış.");
+            }
         }
+
+
     }
 }
  
