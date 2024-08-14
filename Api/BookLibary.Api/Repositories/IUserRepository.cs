@@ -7,7 +7,7 @@ namespace BookLibary.Api.Repositories
     {
         Task<TEntity> GetByNameAsync(string userName);
         Task<TEntity> GetByEmailAsync(string email);
-        Task<TEntity> UpdatePassword(object id ,string password);
+        Task<TEntity> UpdatePassword(string name ,string password);
         Task<TEntity> UpdateUserAsync(object id, User entity);
 
         Task<TEntity> GetUserById(Object  _id);

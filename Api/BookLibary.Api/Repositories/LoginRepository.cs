@@ -68,13 +68,13 @@ namespace BookLibary.Api.Repositories
             }
         }
 
-       public async Task<User> UpdatePassword(object id , string  password)
+       public async Task<User> UpdatePassword(string name , string  password)
         {
             try
             {
                 SHA1 sha = new SHA1CryptoServiceProvider();
                 hashedPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(password)));
-                var filter = Builders<User>.Filter.Eq(u => u.Id, new ObjectId(id.ToString()));
+                var filter = Builders<User>.Filter.Eq(u => u.UserName,name);
                 var update = Builders<User>.Update.Set(u=> u.Password , hashedPassword);
                 var updatedUser= await _model.FindOneAndUpdateAsync(
                     filter, 

@@ -8,7 +8,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
 	{
 
 		Task<UpdateUserDto> UpdateUserAsync(string userId, UpdateUserDto user); 
-		Task<UpdateUserDto> UpdatePassword(string userId,string password);
+		Task<UpdateUserDto> UpdatePassword(string name,string password);
 
     }
 }
