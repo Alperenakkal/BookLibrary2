@@ -79,16 +79,18 @@ namespace BookLibary.Api.Controllers
         [HttpPut("UpdateBorrowedBook")]
          public async Task<IActionResult> UpdateBook([FromBody] BarrowBookIdDto bookId, string id)
          {
-
-            // var userId = await _tokenHelperService.GetIdFromToken();
-             await _borrowService.AddtoReadoutBookAsync(bookId,id);
-
-
-
-
-            
-             return Ok(new { message = "Kitap okunmuş listesine eklendi" });
+            try
+            {
+                await _borrowService.AddtoReadoutBookAsync(bookId, id);
+                return Ok("Kitap Okunmuş Listenize Eklendi");
+            }
+            catch (Exception ex)
+            {
+                // Detaylı hata mesajı ile geri dönün
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
          }
+
          [HttpGet("GetReadOutByName")]
         public async Task<IActionResult> GetReadoutBookByNameAsync(string id)
         {
@@ -103,6 +105,7 @@ namespace BookLibary.Api.Controllers
 
             return Ok(result);
         }
+
         [HttpGet("user/{id}")]
         public async Task<IActionResult> IdGetUser(string id)
         {
