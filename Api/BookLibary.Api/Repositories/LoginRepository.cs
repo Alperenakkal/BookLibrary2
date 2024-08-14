@@ -1,4 +1,5 @@
 ﻿using BookLibary.Api.Data.Context;
+using BookLibary.Api.Dtos.BookDto;
 using BookLibary.Api.Dtos.UserDto;
 using BookLibary.Api.Models;
 using MongoDB.Bson;
@@ -131,15 +132,12 @@ namespace BookLibary.Api.Repositories
         }
 
 
-        public async Task<User> RemoveBookFromUserAsync(object userId, ObjectId bookId)
+        public async Task<User> RemoveBookFromUserAsync(BorrowBookByNameDto bookDto, string userName)
         {
             try
             {
-                var filter = Builders<User>.Filter.Eq("_id", new ObjectId(userId.ToString()));
-                var update = Builders<User>.Update.Pull(
-                    u => u.BorrowBooks,
-                    bookId
-                );
+                var filter = Builders<User>.Filter.Eq(x => x.UserName, userName);
+                var update = Builders<User>.Update.Pull(u => u.BorrowBooks, bookDto.bookName);
 
                 var result = await _model.UpdateOneAsync(filter, update);
 

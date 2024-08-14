@@ -8,15 +8,15 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
     public interface  IBorrowService
     {
 
-        Task<List<Book>> GetBorrowBookAsync(string id);
+        Task<List<Book>> GetBorrowBookAsync(string userName);
         Task<User> GetByIdAsync(string id);
         Task<GetOneResult<User>> UpdateUserAsync(string id, User user);
-        Task AddBorrowedBookAsync( BarrowBookIdDto bookId, string userId);
-        Task<bool> IsBookAvailableAsync(BarrowBookIdDto bookIdR, string id);
-        Task<User> RemoveBookAsync(string userId, BarrowBookIdDto bookId);
+        Task AddBorrowedBookAsync(BorrowBookByNameDto bookDto, string userName);
+        Task<bool> IsBookAvailableAsync(BorrowBookByNameDto bookDto, string userName);
+        Task<User> RemoveBookAsync(BorrowBookByNameDto bookDto, string userName);
         //Task RemoveBorrowedBookAsync( string bookId);
-        Task AddtoReadoutBookAsync(BarrowBookIdDto bookId,string userId);
+        Task AddtoReadoutBookAsync(BorrowBookByNameDto bookDto,string userName);
 
-         Task<List<Book>> GetReadOutAsync(string id);
+         Task<List<Book>> GetReadOutAsync(string userName);
     }
 }
