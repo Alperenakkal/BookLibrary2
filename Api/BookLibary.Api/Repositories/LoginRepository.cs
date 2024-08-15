@@ -109,8 +109,10 @@ namespace BookLibary.Api.Repositories
             .Set(u => u.Email, entity.Email)
             .Set(u => u.gender, entity.gender)
             .Set(u => u.avatarUrl, entity.avatarUrl)
-            .Set(u => u.ReadOutBooks, entity.ReadOutBooks)
-            .Set(u => u.BorrowBooks, entity.BorrowBooks);
+            .Set(u => u.BorrowBooks, entity.BorrowBooks)
+            .Set(u => u.ReadOutBooks, entity.ReadOutBooks);
+
+
 
 
 
@@ -130,7 +132,34 @@ namespace BookLibary.Api.Repositories
                 throw new Exception("Update Error", ex);
             }
         }
+        public async Task<User> UpdateUserBookAsync(object id, User entity)
+        {
+            try
+            {
+                var filter = Builders<User>.Filter.Eq("_id", new ObjectId(id.ToString()));
+                var update = Builders<User>.Update
+            .Set(u => u.BorrowBooks, entity.BorrowBooks)
+            .Set(u => u.ReadOutBooks, entity.ReadOutBooks);
 
+
+
+
+                var result = await _model.UpdateOneAsync(filter, update);
+
+                if (result.IsAcknowledged && result.ModifiedCount > 0)
+                {
+                    return entity;
+                }
+                else
+                {
+                    throw new Exception("User not updated or not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Update Error", ex);
+            }
+        }
 
         public async Task<User> RemoveBookFromUserAsync(BorrowBookByNameDto bookDto, string userName)
         {

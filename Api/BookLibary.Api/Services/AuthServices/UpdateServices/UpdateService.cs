@@ -6,6 +6,7 @@ using BookLibary.Api.Models.Response.UserResponse;
 using BookLibary.Api.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Caching.Memory;
+using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
@@ -19,6 +20,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
     private readonly IUserRepository<User> _repository;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly IMemoryCache _memoryCache;
+
 
 
         public UpdateService(IUserRepository<User> repository, IHttpContextAccessor contextAccessor, IMemoryCache memoryCache)
@@ -52,8 +54,8 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
     {
         UpdateUserDto dto = new UpdateUserDto();
             SHA1 sha = new SHA1CryptoServiceProvider();
-
-
+             ObjectId id = new ObjectId(userId);
+            User oldUser = await _repository.GetUserById(id);
 
           
             if (string.IsNullOrEmpty(userId))
@@ -90,6 +92,9 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
                     gender =model.Gender,
                     avatarUrl=url,
                     IsAdmin = false,
+                    BorrowBooks=oldUser.BorrowBooks,
+                    ReadOutBooks=oldUser.ReadOutBooks,
+                    
 
                 };
                 await _repository.UpdateUserAsync(userId, user);

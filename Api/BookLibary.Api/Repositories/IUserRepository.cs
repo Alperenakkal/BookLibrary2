@@ -11,7 +11,7 @@ namespace BookLibary.Api.Repositories
         Task<TEntity> GetByEmailAsync(string email);
         Task<TEntity> UpdatePassword(string name ,updatePasswordRequest password);
         Task<TEntity> UpdateUserAsync(object id, User entity);
-
+        Task<TEntity> UpdateUserBookAsync(object id, User entity);
         Task<TEntity> GetUserById(Object  _id);
         Task<User> RemoveBookFromUserAsync(BorrowBookByNameDto bookDto, string userName);
 
