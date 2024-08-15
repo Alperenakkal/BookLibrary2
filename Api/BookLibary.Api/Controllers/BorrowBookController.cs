@@ -76,7 +76,7 @@ namespace BookLibary.Api.Controllers
         public async Task<IActionResult> UpdateBook([FromBody] BorrowBookByNameDto bookDto, [FromQuery] string userName)
         {
             await _borrowService.AddtoReadoutBookAsync(bookDto, userName);
-            return Ok("Kitap Okunmuş Listenize Eklendi");
+            return Ok(new { message = "Kitap Okunmuş Listenize Eklendi" });
         }
 
         [HttpGet("GetReadOutByName")]
@@ -93,16 +93,16 @@ namespace BookLibary.Api.Controllers
 
             return Ok(result);
         }
-        [HttpGet("user/{id}")]
-        public async Task<IActionResult> IdGetUser(string id)
-        {
+        //[HttpGet("user/{id}")]
+        //public async Task<IActionResult> IdGetUser(string id)
+        //{
 
-            var user = await _borrowService.GetByIdAsync(id);
+        //    var user = await _borrowService.GetByIdAsync(id);
 
          
 
-            return Ok(user);
-        }
+        //    return Ok(user);
+        //}
 
 
     }
