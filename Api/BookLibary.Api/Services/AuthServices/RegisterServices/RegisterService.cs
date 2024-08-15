@@ -67,6 +67,9 @@ namespace BookLibary.Api.Services.AuthServices.RegisterServices
                 gender = model.Gender,
                 avatarUrl = url,
                 IsAdmin =false,
+                BorrowBooks = [],
+                ReadOutBooks = []
+
 
             };
 
