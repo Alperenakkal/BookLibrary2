@@ -93,16 +93,16 @@ namespace BookLibary.Api.Controllers
 
             return Ok(result);
         }
-        //[HttpGet("user/{id}")]
-        //public async Task<IActionResult> IdGetUser(string id)
-        //{
+        [HttpGet("user/{id}")]
+        public async Task<IActionResult> IdGetUser(string id)
+        {
 
-        //    var user = await _borrowService.GetByIdAsync(id);
+            var user = await _borrowService.GetByIdAsync(id);
 
-         
 
-        //    return Ok(user);
-        //}
+
+            return Ok(user);
+        }
 
 
     }
