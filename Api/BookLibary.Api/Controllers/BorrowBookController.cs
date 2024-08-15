@@ -48,11 +48,7 @@ namespace BookLibary.Api.Controllers
         [HttpPost("AddBorrow")]
         public async Task<IActionResult> AddBorrowedBookAsync([FromBody] BorrowBookByNameDto bookDto, [FromQuery] string userName)
         {
-         //  var userId= await _tokenHelperService.GetIdFromToken();
-          
-            var isAvailable = await _borrowService.IsBookAvailableAsync(bookDto, userName);
-            
-           
+         //  var userId= await _tokenHelperService.GetIdFromToken();                       
             await _borrowService.AddBorrowedBookAsync(bookDto, userName);
             return Ok(new { message = "Eklendi " });
 

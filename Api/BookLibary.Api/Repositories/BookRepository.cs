@@ -104,8 +104,12 @@ using BookLibary.Api.Models;
                 throw new Exception("Book Not found");
             }
         }
+        public async Task<Book> FindBookByNameAsync(string bookName)
+        {
+            var filter = Builders<Book>.Filter.Eq(b => b.BookName, bookName);
+            return await _collection.Find(filter).FirstOrDefaultAsync();
+        }
 
 
-      
     }
  } 
