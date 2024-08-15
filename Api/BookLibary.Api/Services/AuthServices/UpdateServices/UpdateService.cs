@@ -70,7 +70,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
             }
             else if (model.Gender == GenderType.other)
             {
-                url = "https://avatar.iran.liara.run/public";
+                url = $"https://avatar.iran.liara.run/username?username={model.UserName}";
             }
             else
             {

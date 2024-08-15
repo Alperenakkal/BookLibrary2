@@ -66,7 +66,7 @@ public class Startup
             options.AddPolicy("AllowSpecificOrigin",
                 policy =>
                 {
-                    policy.WithOrigins("http://localhost:4200") // İzin verilen köken
+                    policy.WithOrigins("http://localhost:4200", "https://main--booklibraryy.netlify.app")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials(); // Bu satır önemli
@@ -118,6 +118,8 @@ public class Startup
         // CORS politikalarını uygulama
         app.UseCors("AllowSpecificOrigin");
 
+        app.UseRouting();
+
         if (env.IsDevelopment())
         {
             app.UseSwagger();
@@ -131,7 +133,6 @@ public class Startup
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.UseRouting();
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
