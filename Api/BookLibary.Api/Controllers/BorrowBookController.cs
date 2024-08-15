@@ -46,16 +46,29 @@ namespace BookLibary.Api.Controllers
         }
 
         [HttpPost("AddBorrow")]
-        public async Task<IActionResult> AddBorrowedBookAsync([FromBody] BorrowBookByNameDto bookDto, [FromQuery] string userName)
+        public async Task<IActionResult> AddBorrowedBook([FromBody] BorrowBookByNameDto bookDto, [FromQuery] string userName)
         {
-         //  var userId= await _tokenHelperService.GetIdFromToken();                       
-            await _borrowService.AddBorrowedBookAsync(bookDto, userName);
-            return Ok(new { message = "Eklendi " });
-
-
-
-
+            try
+            {
+                await _borrowService.AddBorrowedBookAsync(bookDto, userName);
+                return Ok(new { message = "Kitap başarıyla ödünç alındı." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Bu durumda kitap zaten okundu ama yine de ödünç alındı
+                return Ok(new { message = ex.Message + " Kitap ödünç alındı." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Bir hata oluştu.", details = ex.Message });
+            }
         }
+
+
         [HttpDelete("RemoveBorrowed")]
         public async Task<IActionResult> RemoveBorrowedBookAsync([FromBody] BorrowBookByNameDto bookDto, [FromQuery] string userName)
         {
@@ -67,13 +80,28 @@ namespace BookLibary.Api.Controllers
 
 
 
-
         [HttpPut("UpdateBorrowedBook")]
         public async Task<IActionResult> UpdateBook([FromBody] BorrowBookByNameDto bookDto, [FromQuery] string userName)
         {
-            await _borrowService.AddtoReadoutBookAsync(bookDto, userName);
-            return Ok(new { message = "Kitap Okunmuş Listenize Eklendi" });
+            try
+            {
+                await _borrowService.AddtoReadoutBookAsync(bookDto, userName);
+                return Ok(new { message = "Kitap Okunmuş Listenize Eklendi" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Bir hata oluştu.", details = ex.Message });
+            }
         }
+
 
         [HttpGet("GetReadOutByName")]
         public async Task<IActionResult> GetReadoutBookByNameAsync(string userName)
