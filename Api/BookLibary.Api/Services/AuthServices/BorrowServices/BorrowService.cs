@@ -130,25 +130,28 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         }
         public async Task AddBorrowedBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
-
-            var user = await _userRepository.GetByNameAsync(userName); // Kullanıcıyı ID'ye göre buluyoruz
+            var user = await _userRepository.GetByNameAsync(userName); // Kullanıcıyı kullanıcı adına göre buluyoruz
 
             if (user == null)
             {
                 throw new KeyNotFoundException("Kullanıcı bulunamadı.");
             }
 
-            // Kitap ID'sini ObjectId'ye dönüştürüyoruz
-           // ObjectId bookIdR;
-      
-         var bookName = bookDto.bookName;
+            // Kitap adını alıyoruz
+            var bookName = bookDto.bookName;
 
+            // Kitabın veritabanında olup olmadığını kontrol ediyoruz
+            var book = await _bookRepository.FindBookByNameAsync(bookName);
+            if (book == null)
+            {
+                throw new KeyNotFoundException("Böyle bir kitap bulunamadı.");
+            }
+
+            // Kullanıcıda bu kitap ödünç alınmamışsa ekliyoruz
             if (!user.BorrowBooks.Contains(bookName))
             {
-
                 var borrowBooksList = user.BorrowBooks.ToList();
                 borrowBooksList.Add(bookName);
-
 
                 var userResponse = new User
                 {
@@ -169,14 +172,16 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 {
                     throw new Exception("Kullanıcı güncellenemedi");
                 }
+
+                // 30 gün sonra kitabı otomatik olarak geri vermek için bir görev başlatıyoruz
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromDays(30));
                     await RemoveBookAsync(bookDto, userName);
-
                 });
             }
         }
+
 
         public async Task<bool> IsBookAvailableAsync(BorrowBookByNameDto bookDto, string userName)
         {
