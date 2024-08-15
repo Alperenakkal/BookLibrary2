@@ -90,6 +90,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
                     gender =model.Gender,
                     avatarUrl=url,
                     IsAdmin = false,
+                    
 
                 };
                 await _repository.UpdateUserAsync(userId, user);
