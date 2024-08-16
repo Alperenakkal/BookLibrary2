@@ -146,6 +146,10 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             {
                 throw new KeyNotFoundException("Böyle bir kitap bulunamadı.");
             }
+            if (book.Stock <= 0)
+            {
+                throw new InvalidOperationException("Bu kitap stokta kalmadı.");
+            }
 
             // Eğer kitap okunanlar listesinde ise, uyarı mesajı hazırla
             bool alreadyRead = user.ReadOutBooks.Contains(bookName);
@@ -160,7 +164,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             {
                 var borrowBooksList = user.BorrowBooks.ToList();
                 borrowBooksList.Add(bookName);
-
+                book.Stock -= 1;
                 var userResponse = new User
                 {
                     Id = user.Id,
@@ -175,6 +179,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 };
 
                 var updateResult = await _userRepository.UpdateUserAsync(user.Id, userResponse);
+                var bookUpdateResult = await _bookRepository.UpdateBookAsync(book.Id, book);
 
                 if (updateResult == null)
                 {
