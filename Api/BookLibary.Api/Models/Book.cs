@@ -23,7 +23,7 @@ namespace BookLibary.Api.Models
         public int Stock { get; set; }
         public string CoverImageUrl { get; set; }
 
-        public CategoryEnum Category { get; set; }
+        public string Category { get; set; }
 
 
      }
