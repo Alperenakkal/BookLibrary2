@@ -42,10 +42,12 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
            
         {
             LoginResponse response = new LoginResponse();
-            User user = await _repository.GetByNameAsync(request.Username);
+            User getUserByUserName = await _repository.GetByNameAsync(request.Username);  
+            User getUserByUserEmail = await _repository.GetByEmailAsync(request.email);
+            
             SHA1 sha = new SHA1CryptoServiceProvider();
             hashPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(request.Password)));
-
+            GenerateTokenResponse generatedTokenInformation = new GenerateTokenResponse();
 
 
             if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
@@ -54,15 +56,39 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
             }
 
 
-            if (user == null)
+            if (getUserByUserEmail != null && getUserByUserName != null)
             {
                 response.AuthenticateResult = false;
                 return response;
             }
-            
-            if (user.Password == hashPassword)
+
+            if (getUserByUserEmail!=null)
             {
-                var generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = user.Id.ToString() });
+                generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserEmail.Id.ToString() });
+                response.AuthenticateResult = true;
+                response.AuthToken = generatedTokenInformation.Token;
+                response.AccessTokenExpireDate = generatedTokenInformation.TokenExpireDate;
+
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = generatedTokenInformation.TokenExpireDate,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                };
+                _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
+                _memoryCache.Set("Bearer", generatedTokenInformation.Token);
+                response.Admin = getUserByUserEmail.IsAdmin ? "Admin" : "Kullanici";
+
+            }
+         
+            if (getUserByUserName !=null)
+            {
+               
+              
+                 generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserName.Id.ToString() }); 
+
+              
 
                 response.AuthenticateResult = true;
                 response.AuthToken = generatedTokenInformation.Token;
@@ -77,10 +103,11 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
                 };
                 _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
                 _memoryCache.Set("Bearer",generatedTokenInformation.Token);
+                 response.Admin = getUserByUserName.IsAdmin ? "Admin" : "Kullanici"; 
+             
 
-                response.Admin = user.IsAdmin ? "Admin" : "Kullanici";
             }
-            else
+            if(getUserByUserName == null && getUserByUserEmail == null)
             {
                 response.AuthenticateResult = false;
             }
