@@ -21,6 +21,7 @@ namespace BookLibary.Api.Models
 
          public bool IsAvailable { get; set; }
         public int Stock { get; set; }
+        public string CoverImageUrl { get; set; }
 
 
      }
