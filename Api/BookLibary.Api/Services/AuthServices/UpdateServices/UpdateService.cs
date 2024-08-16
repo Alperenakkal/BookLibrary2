@@ -38,7 +38,6 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
                 {
                     Email = user.Email,
                     FullName= user.FullName,
-                    UserName = user.UserName,
                     Gender =user.gender,
                 };
                 return userDto;
@@ -67,16 +66,16 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
             var url = "";
             if (model.Gender == GenderType.Female)
             {
-                url = $"https://avatar.iran.liara.run/public/girl/?username={model.UserName}";
+                url = $"https://avatar.iran.liara.run/public/girl/?username={oldUser.UserName}";
 
             }
             else if (model.Gender == GenderType.other)
             {
-                url = $"https://avatar.iran.liara.run/username?username={model.UserName}";
+                url = $"https://avatar.iran.liara.run/username?username={oldUser.UserName}";
             }
             else
             {
-                url = $"https://avatar.iran.liara.run/public/boy/?username={model.UserName}";
+                url = $"https://avatar.iran.liara.run/public/boy/?username={oldUser.UserName}";
 
             }
 
@@ -85,7 +84,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
            
                 var user = new User
                 {
-                    UserName = model.UserName,
+                    UserName = oldUser.UserName,
                     FullName = model.FullName,
                     Email = model.Email,
           
@@ -99,7 +98,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
                 };
                 await _repository.UpdateUserAsync(userId, user);
 
-            dto.UserName = user.UserName;
+            
             dto.FullName = user.FullName;
             dto.Email = user.Email;
           
