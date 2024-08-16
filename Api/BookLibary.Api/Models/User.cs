@@ -37,6 +37,7 @@ namespace BookLibary.Api.Models
 
         [BsonElement("Gender")]
         public GenderType gender {  get; set; }
+        
 
 
     }

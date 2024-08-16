@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using BookLibary.Api.Services.AuthServices.IdentityServices;
 
 public class Startup
 {
@@ -41,6 +42,7 @@ public class Startup
         services.AddScoped<IRegisterRepository<User>, RegisterRepository>();
         services.AddScoped<IRegisterService, RegisterService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IIdentityService,IdentityService>();
         services.AddHttpContextAccessor();
         services.AddMemoryCache();
 
