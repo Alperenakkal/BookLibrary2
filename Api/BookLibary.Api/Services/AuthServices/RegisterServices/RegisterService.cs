@@ -4,7 +4,7 @@ using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
 using System.Security.Cryptography;
 using System.Text;
-using static System.Net.WebRequestMethods;
+
 
 namespace BookLibary.Api.Services.AuthServices.RegisterServices
 {

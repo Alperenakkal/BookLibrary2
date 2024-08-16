@@ -2,6 +2,7 @@
 using BookLibary.Api.Models.Request.UserRequest;
 using BookLibary.Api.Models.Response.UserResponse;
 using BookLibary.Api.Repositories;
+using BookLibary.Api.Services.AuthServices.IdentityServices;
 using BookLibary.Api.Services.AuthServices.TokenServices;
 using Microsoft.Extensions.Caching.Memory;
 using System.Security.Cryptography;
@@ -14,16 +15,18 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
         private readonly IUserRepository<User> _repository;
         private readonly ITokenService _tokenService;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IIdentityService _ıdentityservice;
         private readonly IMemoryCache _memoryCache;
         private string hashPassword;
 
 
-        public LoginService(IUserRepository<User> repository, ITokenService tokenService, IHttpContextAccessor contextAccessor, IMemoryCache memoryCache)
+        public LoginService(IUserRepository<User> repository, ITokenService tokenService, IHttpContextAccessor contextAccessor, IMemoryCache memoryCache, IIdentityService ıdentityService)
         {
             _repository = repository;
             _tokenService = tokenService;
             _contextAccessor = contextAccessor;
             _memoryCache = memoryCache;
+            _ıdentityservice = ıdentityService;
         }
 
         public async Task<User> GetByNameAsync(string name)
@@ -42,8 +45,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
 
         {
             LoginResponse response = new LoginResponse();
-            User getUserByUserName = await _repository.GetByNameAsync(request.Username);
-            User getUserByUserEmail = await _repository.GetByEmailAsync(request.Email);
+            User user = await _ıdentityservice.LoginByUserNameAndEmailQuery(await _repository.GetByNameAsync(request.Username), await _repository.GetByEmailAsync(request.Email));
 
             SHA1 sha = new SHA1CryptoServiceProvider();
             hashPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(request.Password)));
@@ -56,75 +58,43 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
             }
 
 
-            if (getUserByUserEmail != null && getUserByUserName != null)
+            if (user == null)
             {
                 response.AuthenticateResult = false;
                 return response;
             }
+            
 
-            if (getUserByUserEmail != null)
+
+            if (user.Password== hashPassword)
             {
-                if(getUserByUserEmail.Password! == hashPassword)
-                {
-                    generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserEmail.Id.ToString() });
-                    response.AuthenticateResult = true;
-                    response.AuthToken = generatedTokenInformation.Token;
-                    response.AccessTokenExpireDate = generatedTokenInformation.TokenExpireDate;
+                generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = user.Id.ToString() });
+                response.AuthenticateResult = true;
+                response.AuthToken = generatedTokenInformation.Token;
+                response.AccessTokenExpireDate = generatedTokenInformation.TokenExpireDate;
 
-                    var cookieOptions = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Expires = generatedTokenInformation.TokenExpireDate,
-                        Secure = true,
-                        SameSite = SameSiteMode.Strict
-                    };
-                    _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
-                    _memoryCache.Set("Bearer", generatedTokenInformation.Token);
-                    response.Admin = getUserByUserEmail.IsAdmin ? "Admin" : "Kullanici";
-
-                }
-                else
+                var cookieOptions = new CookieOptions
                 {
-                    response.AuthenticateResult = false;
-                }
-               
+                    HttpOnly = true,
+                    Expires = generatedTokenInformation.TokenExpireDate,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict
+                };
+                _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
+                _memoryCache.Set("Bearer", generatedTokenInformation.Token);
+                response.Admin = user.IsAdmin ? "Admin" : "Kullanici";
 
             }
-
-            if (getUserByUserName != null)
+            else
             {
-                if (getUserByUserName!.Password == hashPassword) 
-                {
-
-                    generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserName.Id.ToString() });
-
-
-
-                    response.AuthenticateResult = true;
-                    response.AuthToken = generatedTokenInformation.Token;
-                    response.AccessTokenExpireDate = generatedTokenInformation.TokenExpireDate;
-
-                    var cookieOptions = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Expires = generatedTokenInformation.TokenExpireDate,
-                        Secure = true,
-                        SameSite = SameSiteMode.Strict
-                    };
-                    _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
-                    _memoryCache.Set("Bearer", generatedTokenInformation.Token);
-                    response.Admin = getUserByUserName.IsAdmin ? "Admin" : "Kullanici";
-                }
-                else
-                {
-                    response.AuthenticateResult = false;
-                }
-
-
-
-
+                response.AuthenticateResult = false;
             }
-          
+
+
+
+
+
+
 
             return response;
         }
