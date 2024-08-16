@@ -85,7 +85,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
            
                 var user = new User
                 {
-                    UserName = model.UserName,
+                    UserName = oldUser.UserName,
                     FullName = model.FullName,
                     Email = model.Email,
           
