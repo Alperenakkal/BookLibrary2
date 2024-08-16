@@ -1,5 +1,6 @@
 using BookLibary.Api.Models;
 using MongoDB.Bson;
+using MongoDB.Driver;
 namespace BookLibary.Api.Repositories{
  public interface IBookRepository<T> where T: class
      {
@@ -9,5 +10,7 @@ namespace BookLibary.Api.Repositories{
         Task<T> InsertOneAsync(Book book);
          Task<GetManyResult<Book>> GetAllAsync();
          Task<GetOneResult<Book>> DeleteByNameAsync(string bookName);
+        Task<Book> FindBookByNameAsync(string bookName);
+       
     } 
  }

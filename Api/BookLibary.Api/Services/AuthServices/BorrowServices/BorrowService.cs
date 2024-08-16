@@ -130,25 +130,36 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         }
         public async Task AddBorrowedBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
-
-            var user = await _userRepository.GetByNameAsync(userName); // Kullanıcıyı ID'ye göre buluyoruz
+            var user = await _userRepository.GetByNameAsync(userName); // Kullanıcıyı kullanıcı adına göre buluyoruz
 
             if (user == null)
             {
                 throw new KeyNotFoundException("Kullanıcı bulunamadı.");
             }
 
-            // Kitap ID'sini ObjectId'ye dönüştürüyoruz
-           // ObjectId bookIdR;
-      
-         var bookName = bookDto.bookName;
+            // Kitap adını alıyoruz
+            var bookName = bookDto.bookName;
 
+            // Kitabın veritabanında olup olmadığını kontrol ediyoruz
+            var book = await _bookRepository.FindBookByNameAsync(bookName);
+            if (book == null)
+            {
+                throw new KeyNotFoundException("Böyle bir kitap bulunamadı.");
+            }
+
+            // Eğer kitap okunanlar listesinde ise, uyarı mesajı hazırla
+            bool alreadyRead = user.ReadOutBooks.Contains(bookName);
+            if (alreadyRead)
+            {
+                // Uyarıyı döndürecek ama işlem devam edecek
+                Console.WriteLine("Bu kitabı zaten okudunuz.");
+            }
+
+            // Kitabı BorrowBooks listesine ekle
             if (!user.BorrowBooks.Contains(bookName))
             {
-
                 var borrowBooksList = user.BorrowBooks.ToList();
                 borrowBooksList.Add(bookName);
-
 
                 var userResponse = new User
                 {
@@ -169,14 +180,24 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 {
                     throw new Exception("Kullanıcı güncellenemedi");
                 }
+
+                // 30 gün sonra kitabı otomatik olarak geri vermek için bir görev başlatıyoruz
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromDays(30));
                     await RemoveBookAsync(bookDto, userName);
-
                 });
             }
+
+            // Eğer kitap zaten okunanlar listesinde ise bir uyarı mesajı döndür
+            if (alreadyRead)
+            {
+                throw new InvalidOperationException("Bu kitabı zaten okudunuz.");
+            }
         }
+
+
+
 
         public async Task<bool> IsBookAvailableAsync(BorrowBookByNameDto bookDto, string userName)
         {
@@ -218,31 +239,26 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 var borrowBooksList = user.BorrowBooks.ToList();
                 var readOutBooksList = user.ReadOutBooks.ToList();
 
-                // Kitabı ödünç alınanlardan çıkar ve okunan kitaplara ekle
+                // Kitabı ödünç alınanlardan çıkar
                 borrowBooksList.Remove(bookName);
-                readOutBooksList.Add(bookName);
+
+                // Eğer kitap okunanlar listesinde değilse, ekleyelim
+                if (!readOutBooksList.Contains(bookName))
+                {
+                    readOutBooksList.Add(bookName);
+                }
+                else
+                {
+                    Console.WriteLine("Kitap zaten okunanlar listesinde mevcut.");
+                }
 
                 // Kullanıcı nesnesini güncelle
                 user.BorrowBooks = borrowBooksList;
                 user.ReadOutBooks = readOutBooksList;
 
-                // Kullanıcıyı veritabanında güncellemek için yeni kullanıcı nesnesi oluştur
-                var userResponse = new User
-                {
-                    Id = user.Id,
-                    FullName = user.FullName,
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    gender = user.gender,
-                    avatarUrl = user.avatarUrl,
-                    ReadOutBooks = readOutBooksList,
-                    Password = user.Password,
-                    BorrowBooks = borrowBooksList
-                };
-
                 try
                 {
-                    var updateResult = await _userRepository.UpdateUserAsync(user.Id, userResponse);
+                    var updateResult = await _userRepository.UpdateUserAsync(user.Id, user);
                     Console.WriteLine("Okunan kitap listesi güncellendi.");
                 }
                 catch (Exception ex)
