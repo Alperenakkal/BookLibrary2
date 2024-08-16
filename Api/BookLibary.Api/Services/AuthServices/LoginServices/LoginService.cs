@@ -18,7 +18,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
         private string hashPassword;
 
 
-        public LoginService(IUserRepository<User> repository, ITokenService tokenService, IHttpContextAccessor contextAccessor,IMemoryCache memoryCache)
+        public LoginService(IUserRepository<User> repository, ITokenService tokenService, IHttpContextAccessor contextAccessor, IMemoryCache memoryCache)
         {
             _repository = repository;
             _tokenService = tokenService;
@@ -28,7 +28,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
 
         public async Task<User> GetByNameAsync(string name)
         {
-            User user = await _repository.GetByNameAsync(name); 
+            User user = await _repository.GetByNameAsync(name);
             return user;
         }
         public async Task<User> GetByEmailAsync(string email)
@@ -36,21 +36,21 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
             User user = await _repository.GetByEmailAsync(email);
             return user;
         }
-        
+
 
         public async Task<LoginResponse> LoginUserAsync(LoginRequest request)
-           
+
         {
             LoginResponse response = new LoginResponse();
-            User getUserByUserName = await _repository.GetByNameAsync(request.Username);  
-            User getUserByUserEmail = await _repository.GetByEmailAsync(request.email);
-            
+            User getUserByUserName = await _repository.GetByNameAsync(request.Username);
+            User getUserByUserEmail = await _repository.GetByEmailAsync(request.Email);
+
             SHA1 sha = new SHA1CryptoServiceProvider();
             hashPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(request.Password)));
             GenerateTokenResponse generatedTokenInformation = new GenerateTokenResponse();
 
 
-            if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Password))
+            if ((string.IsNullOrEmpty(request.Username) && (string.IsNullOrEmpty(request.Email)) || string.IsNullOrEmpty(request.Password)))
             {
                 throw new ArgumentException("Username and Password cannot be null or empty.");
             }
@@ -62,7 +62,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
                 return response;
             }
 
-            if (getUserByUserEmail!=null)
+            if (getUserByUserEmail != null)
             {
                 generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserEmail.Id.ToString() });
                 response.AuthenticateResult = true;
@@ -81,14 +81,14 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
                 response.Admin = getUserByUserEmail.IsAdmin ? "Admin" : "Kullanici";
 
             }
-         
-            if (getUserByUserName !=null)
-            {
-               
-              
-                 generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserName.Id.ToString() }); 
 
-              
+            if (getUserByUserName != null)
+            {
+
+
+                generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserName.Id.ToString() });
+
+
 
                 response.AuthenticateResult = true;
                 response.AuthToken = generatedTokenInformation.Token;
@@ -102,12 +102,12 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
                     SameSite = SameSiteMode.Strict
                 };
                 _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
-                _memoryCache.Set("Bearer",generatedTokenInformation.Token);
-                 response.Admin = getUserByUserName.IsAdmin ? "Admin" : "Kullanici"; 
-             
+                _memoryCache.Set("Bearer", generatedTokenInformation.Token);
+                response.Admin = getUserByUserName.IsAdmin ? "Admin" : "Kullanici";
+
 
             }
-            if(getUserByUserName == null && getUserByUserEmail == null)
+            if (getUserByUserName == null && getUserByUserEmail == null)
             {
                 response.AuthenticateResult = false;
             }

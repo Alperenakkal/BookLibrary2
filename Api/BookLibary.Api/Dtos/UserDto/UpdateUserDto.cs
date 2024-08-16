@@ -6,7 +6,7 @@ namespace BookLibary.Api.Dtos.UserDto
     public class UpdateUserDto
     {
        
-        public string UserName { get; set; }
+      //  public string UserName { get; set; }
 
         public string FullName { get; set; }
      
