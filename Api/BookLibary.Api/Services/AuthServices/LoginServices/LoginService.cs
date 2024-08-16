@@ -64,53 +64,67 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
 
             if (getUserByUserEmail != null)
             {
-                generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserEmail.Id.ToString() });
-                response.AuthenticateResult = true;
-                response.AuthToken = generatedTokenInformation.Token;
-                response.AccessTokenExpireDate = generatedTokenInformation.TokenExpireDate;
-
-                var cookieOptions = new CookieOptions
+                if(getUserByUserEmail.Password! == hashPassword)
                 {
-                    HttpOnly = true,
-                    Expires = generatedTokenInformation.TokenExpireDate,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict
-                };
-                _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
-                _memoryCache.Set("Bearer", generatedTokenInformation.Token);
-                response.Admin = getUserByUserEmail.IsAdmin ? "Admin" : "Kullanici";
+                    generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserEmail.Id.ToString() });
+                    response.AuthenticateResult = true;
+                    response.AuthToken = generatedTokenInformation.Token;
+                    response.AccessTokenExpireDate = generatedTokenInformation.TokenExpireDate;
+
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Expires = generatedTokenInformation.TokenExpireDate,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict
+                    };
+                    _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
+                    _memoryCache.Set("Bearer", generatedTokenInformation.Token);
+                    response.Admin = getUserByUserEmail.IsAdmin ? "Admin" : "Kullanici";
+
+                }
+                else
+                {
+                    response.AuthenticateResult = false;
+                }
+               
 
             }
 
             if (getUserByUserName != null)
             {
-
-
-                generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserName.Id.ToString() });
-
-
-
-                response.AuthenticateResult = true;
-                response.AuthToken = generatedTokenInformation.Token;
-                response.AccessTokenExpireDate = generatedTokenInformation.TokenExpireDate;
-
-                var cookieOptions = new CookieOptions
+                if (getUserByUserName!.Password == hashPassword) 
                 {
-                    HttpOnly = true,
-                    Expires = generatedTokenInformation.TokenExpireDate,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict
-                };
-                _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
-                _memoryCache.Set("Bearer", generatedTokenInformation.Token);
-                response.Admin = getUserByUserName.IsAdmin ? "Admin" : "Kullanici";
+
+                    generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = getUserByUserName.Id.ToString() });
+
+
+
+                    response.AuthenticateResult = true;
+                    response.AuthToken = generatedTokenInformation.Token;
+                    response.AccessTokenExpireDate = generatedTokenInformation.TokenExpireDate;
+
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Expires = generatedTokenInformation.TokenExpireDate,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict
+                    };
+                    _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
+                    _memoryCache.Set("Bearer", generatedTokenInformation.Token);
+                    response.Admin = getUserByUserName.IsAdmin ? "Admin" : "Kullanici";
+                }
+                else
+                {
+                    response.AuthenticateResult = false;
+                }
+
+
 
 
             }
-            if (getUserByUserName == null && getUserByUserEmail == null)
-            {
-                response.AuthenticateResult = false;
-            }
+          
 
             return response;
         }
