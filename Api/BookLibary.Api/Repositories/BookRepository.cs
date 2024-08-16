@@ -110,6 +110,12 @@ using BookLibary.Api.Models;
             return await _collection.Find(filter).FirstOrDefaultAsync();
         }
 
+        public async Task<Book> UpdateBookAsync(ObjectId id, Book updatedBook)
+        {
+            var filter = Builders<Book>.Filter.Eq(b => b.Id, id);
+            var result = await _collection.ReplaceOneAsync(filter, updatedBook);
+            return result.IsAcknowledged && result.ModifiedCount > 0 ? updatedBook : null;
+        }
 
     }
- } 
+} 
