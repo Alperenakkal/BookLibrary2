@@ -54,6 +54,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                         Publisher = book1.Publisher,
                         IsAvailable = book1.IsAvailable,
                         Stock = book1.Stock,
+                        Category = book1.Category,
                     };
                     bookList.Add(bookResponse);
                 }
@@ -79,6 +80,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                         BookName = book1.BookName,
                         Author = book1.Author,
                         Publisher = book1.Publisher,
+                        Category = book1.Category,
                     };
                     bookList2.Add(bookResponse2);
                 }
@@ -180,6 +182,12 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 throw new InvalidOperationException("Bu kitap stokta kalmadı.");
             }
 
+            //3'ten fazla Ödünç Kitap Alamamamızı sağlıyor...
+            if (user.BorrowBooks.Count > 2)
+            {
+                throw new InvalidOperationException("Daha Fazla Ödünç Kitap Alamazsınız.Başka kitapları Ödünç Alabilmek İçin Lütfen Ödünç Listenizden kitap çıkarın.");
+
+            }
             // Kitabın zaten ReadOutBooks listesinde olup olmadığını kontrol edin
 
             bool alreadyRead = user.ReadOutBooks.Contains(bookName);
@@ -202,7 +210,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 {
                     book.IsAvailable = false;
                 }
-
+               
                 var userResponse = new User
                 {
                     Id = user.Id,

@@ -6,7 +6,6 @@ namespace BookLibary.Api.Models
      public class Book:IBook
      {
          [BsonId]
-
          public ObjectId Id { get; set; }
 
          [BsonElement("BookName")]
@@ -20,10 +19,12 @@ namespace BookLibary.Api.Models
          [BsonElement("IsAvailable")]
 
          public bool IsAvailable { get; set; }
+        [BsonElement("Stock")]
         public int Stock { get; set; }
+        [BsonElement("CoverImageUrl")]
         public string CoverImageUrl { get; set; }
-
-        public string Category { get; set; }
+        [BsonElement("Category")]
+        public string Category { get; set; }    
 
 
      }
