@@ -18,7 +18,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
         private string hashPassword;
 
 
-        public LoginService(IUserRepository<User> repository, ITokenService tokenService, IHttpContextAccessor contextAccessor,IMemoryCache memoryCache)
+        public LoginService(IUserRepository<User> repository, ITokenService tokenService, IHttpContextAccessor contextAccessor, IMemoryCache memoryCache)
         {
             _repository = repository;
             _tokenService = tokenService;
@@ -28,7 +28,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
 
         public async Task<User> GetByNameAsync(string name)
         {
-            User user = await _repository.GetByNameAsync(name); 
+            User user = await _repository.GetByNameAsync(name);
             return user;
         }
         public async Task<User> GetByEmailAsync(string email)
@@ -36,10 +36,10 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
             User user = await _repository.GetByEmailAsync(email);
             return user;
         }
-        
+
 
         public async Task<LoginResponse> LoginUserAsync(LoginRequest request)
-           
+
         {
             LoginResponse response = new LoginResponse();
             User user = await _repository.GetByNameAsync(request.Username);
@@ -59,7 +59,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
                 response.AuthenticateResult = false;
                 return response;
             }
-            
+
             if (user.Password == hashPassword)
             {
                 var generatedTokenInformation = await _tokenService.GenerateToken(new GenerateTokenRequest { id = user.Id.ToString() });
@@ -76,7 +76,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
                     SameSite = SameSiteMode.Strict
                 };
                 _contextAccessor.HttpContext.Response.Cookies.Append("AuthToken", generatedTokenInformation.Token, cookieOptions);
-                _memoryCache.Set("Bearer",generatedTokenInformation.Token);
+                _memoryCache.Set("Bearer", generatedTokenInformation.Token);
 
                 response.Admin = user.IsAdmin ? "Admin" : "Kullanici";
             }
