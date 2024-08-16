@@ -52,10 +52,12 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                         BookName = book1.BookName,
                         Author = book1.Author,
                         Publisher = book1.Publisher,
-                        IsAvailable = false
+                        IsAvailable = book1.IsAvailable,
+                        Stock = book1.Stock,
                     };
                     bookList.Add(bookResponse);
                 }
+                
             }
 
             return bookList;
@@ -77,7 +79,6 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                         BookName = book1.BookName,
                         Author = book1.Author,
                         Publisher = book1.Publisher,
-                        IsAvailable = false
                     };
                     bookList2.Add(bookResponse2);
                 }
@@ -130,36 +131,53 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         }
         public async Task AddBorrowedBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
-            var user = await _userRepository.GetByNameAsync(userName); // Kullanıcıyı kullanıcı adına göre buluyoruz
+            var user = await _userRepository.GetByNameAsync(userName); // Find user by username
 
             if (user == null)
             {
                 throw new KeyNotFoundException("Kullanıcı bulunamadı.");
             }
 
-            // Kitap adını alıyoruz
+            // kitap isimlerini Dto çekme
             var bookName = bookDto.bookName;
 
-            // Kitabın veritabanında olup olmadığını kontrol ediyoruz
+            // Veritabanında böyle bir kitap var mı Kontrolü
             var book = await _bookRepository.FindBookByNameAsync(bookName);
             if (book == null)
             {
                 throw new KeyNotFoundException("Böyle bir kitap bulunamadı.");
             }
 
-            // Eğer kitap okunanlar listesinde ise, uyarı mesajı hazırla
+            // stok kontrol
+            if (book.Stock <= 0)
+            {
+                book.IsAvailable = false;
+                await _bookRepository.UpdateBookAsync(book.Id, book); 
+                throw new InvalidOperationException("Bu kitap stokta kalmadı.");
+            }
+
+            // Kitabın zaten ReadOutBooks listesinde olup olmadığını kontrol edin
+
             bool alreadyRead = user.ReadOutBooks.Contains(bookName);
             if (alreadyRead)
             {
-                // Uyarıyı döndürecek ama işlem devam edecek
-                Console.WriteLine("Bu kitabı zaten okudunuz.");
+                throw new InvalidOperationException("Bu kitabı zaten okudunuz.");
             }
 
-            // Kitabı BorrowBooks listesine ekle
+            // Henüz orada değilse, kitabı Ödünç Kitaplar listesine ekleyin
+
             if (!user.BorrowBooks.Contains(bookName))
             {
                 var borrowBooksList = user.BorrowBooks.ToList();
                 borrowBooksList.Add(bookName);
+                book.Stock -= 1;
+
+                // Kitap kullanılabilirliğini yeni stok düzeyine göre güncelleyin
+
+                if (book.Stock <= 0)
+                {
+                    book.IsAvailable = false;
+                }
 
                 var userResponse = new User
                 {
@@ -175,24 +193,19 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 };
 
                 var updateResult = await _userRepository.UpdateUserAsync(user.Id, userResponse);
+                var bookUpdateResult = await _bookRepository.UpdateBookAsync(book.Id, book);
 
                 if (updateResult == null)
                 {
                     throw new Exception("Kullanıcı güncellenemedi");
                 }
 
-                // 30 gün sonra kitabı otomatik olarak geri vermek için bir görev başlatıyoruz
+                // Start a task to automatically return the book after 30 days
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromDays(30));
                     await RemoveBookAsync(bookDto, userName);
                 });
-            }
-
-            // Eğer kitap zaten okunanlar listesinde ise bir uyarı mesajı döndür
-            if (alreadyRead)
-            {
-                throw new InvalidOperationException("Bu kitabı zaten okudunuz.");
             }
         }
 
