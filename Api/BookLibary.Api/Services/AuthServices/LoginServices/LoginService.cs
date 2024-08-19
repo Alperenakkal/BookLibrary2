@@ -5,6 +5,7 @@ using BookLibary.Api.Repositories;
 using BookLibary.Api.Services.AuthServices.IdentityServices;
 using BookLibary.Api.Services.AuthServices.TokenServices;
 using Microsoft.Extensions.Caching.Memory;
+using BookLibary.Api.Middleware;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -32,11 +33,19 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
         public async Task<User> GetByNameAsync(string name)
         {
             User user = await _repository.GetByNameAsync(name);
+            if(user == null)
+            {
+                throw new NotFoundException($"{name} not found ");
+            }
             return user;
         }
         public async Task<User> GetByEmailAsync(string email)
         {
             User user = await _repository.GetByEmailAsync(email);
+            if (user == null)
+            {
+                throw new NotFoundException($"{email} not found ");
+            }
             return user;
         }
 
