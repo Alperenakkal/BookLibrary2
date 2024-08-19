@@ -10,6 +10,13 @@ namespace BookLibary.Api.Models
         Male,
         Female
     }
+
+    public class BorrowedBook
+    {
+        public string BookName { get; set; } = string.Empty;
+        public bool IsAvailable { get; set; } = true; // Kullanıcı için varsayılan olarak true
+    }
+
     public class User:IUser
     {
         [BsonId]
@@ -25,9 +32,10 @@ namespace BookLibary.Api.Models
 
 
         [BsonElement("BorrowBooks")]
-        public List<string> BorrowBooks { get; set; } 
+        public List<BorrowedBook> BorrowBooks { get; set; } = new List<BorrowedBook>();
+
         [BsonElement("ReadOutBooks")]
-        public List<string> ReadOutBooks {get; set;} 
+        public List<string> ReadOutBooks { get; set; } = new List<string>();
 
         [BsonElement("Admin")]
         public bool IsAdmin { get; set; }

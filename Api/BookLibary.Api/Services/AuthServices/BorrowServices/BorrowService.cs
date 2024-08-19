@@ -37,32 +37,38 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
         }
         public async Task<List<Book>> GetBorrowBookAsync(string userName)
         {
-          //  ObjectId userId = new ObjectId(id);
+            // Kullanıcıyı kullanıcı adına göre bul
             User user = await _userRepository.GetByNameAsync(userName);
+
+            // Kullanıcının ödünç aldığı kitaplar listesi
             var bookList = new List<Book>();
             var borrowBooksList = user.BorrowBooks.ToList();
-            foreach (var book in borrowBooksList)
+
+            foreach (var borrowedBook in borrowBooksList)
             {
-                var book1 = await _bookRepository.GetByNameAsync(book.ToString());
-                if (book1 != null)
+                var book = await _bookRepository.FindBookByNameAsync(borrowedBook.BookName);
+
+                if (book != null)
                 {
                     var bookResponse = new Book
                     {
-                        Id = book1.Id,
-                        BookName = book1.BookName,
-                        Author = book1.Author,
-                        Publisher = book1.Publisher,
-                        IsAvailable = book1.IsAvailable,
-                        Stock = book1.Stock,
-                        Category = book1.Category,
+                        Id = book.Id,
+                        BookName = book.BookName,
+                        Author = book.Author,
+                        Publisher = book.Publisher,
+                        // Sadece o kullanıcı için IsAvailable değerini set et
+                        IsAvailable = borrowedBook.IsAvailable,
+                        Stock = book.Stock,
+                        Category = book.Category,
                     };
                     bookList.Add(bookResponse);
                 }
-                
             }
 
             return bookList;
         }
+
+
         public async Task<List<Book>> GetReadOutAsync(string userName)
         {
            // ObjectId userId = new ObjectId(id);
@@ -116,219 +122,216 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             }
             return await _repository.ReplaceOneAsync(user, id.ToString());
         }
-     public async Task<User> RemoveBookAsync(BorrowBookByNameDto bookDto, string userName)
-{
-    // Find the user by username
-    var user = await _userRepository.RemoveBookFromUserAsync(bookDto, userName);
-
-    if (user == null)
-    {
-        throw new Exception("Kullanıcı bulunamadı");
-    }
-
-    // Get the book name from the DTO
-    var bookName = bookDto.bookName;
-
-    // Find the book in the repository
-    var book = await _bookRepository.FindBookByNameAsync(bookName);
-    if (book == null)
-    {
-        throw new KeyNotFoundException("Böyle bir kitap bulunamadı.");
-    }
-
-    // İade edildiğinde stoğu arttır
-    book.Stock += 1;
-
-    // önceden mevcut değilse stoğa geldiğinde IsAvailable ı artık true yap
-    if (!book.IsAvailable && book.Stock > 0)
-    {
-        book.IsAvailable = true;
-    }
-
-    // Update the book in the repository
-    var bookUpdateResult = await _bookRepository.UpdateBookAsync(book.Id, book);
-    if (bookUpdateResult == null)
-    {
-        throw new Exception("Kitap güncellenemedi");
-    }
-
-    return user;
-}
-
-        public async Task AddBorrowedBookAsync(BorrowBookByNameDto bookDto, string userName)
+        public async Task<User> RemoveBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
-            var user = await _userRepository.GetByNameAsync(userName); // Find user by username
+            // Kullanıcıyı bul
+            var user = await _userRepository.GetByNameAsync(userName);
 
             if (user == null)
             {
-                throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+                throw new Exception("Kullanıcı bulunamadı");
             }
 
-            // kitap isimlerini Dto çekme
+            // Kitap adını al
             var bookName = bookDto.bookName;
 
-            // Veritabanında böyle bir kitap var mı Kontrolü
+            // Kullanıcının ödünç aldığı kitaplar listesinden kitabı bul
+            var borrowedBook = user.BorrowBooks.FirstOrDefault(b => string.Equals(b.BookName, bookName, StringComparison.OrdinalIgnoreCase));
+
+            if (borrowedBook == null)
+            {
+                throw new InvalidOperationException("Bu kitap kullanıcı tarafından ödünç alınmamış.");
+            }
+
+            // Kitap adını kullanarak kitabı bul
             var book = await _bookRepository.FindBookByNameAsync(bookName);
             if (book == null)
             {
                 throw new KeyNotFoundException("Böyle bir kitap bulunamadı.");
             }
 
-            // stok kontrol
-            if (book.Stock <= 0)
+            // Kitabı kullanıcıdan kaldır
+            user.BorrowBooks.Remove(borrowedBook);
+
+            // Kitap stokunu artır
+            book.Stock += 1;
+
+            // Kitap mevcut değilse IsAvailable durumunu true yap
+            if (!book.IsAvailable)
             {
-                book.IsAvailable = false;
-                await _bookRepository.UpdateBookAsync(book.Id, book); 
-                throw new InvalidOperationException("Bu kitap stokta kalmadı.");
+                book.IsAvailable = true;
             }
 
-            //3'ten fazla Ödünç Kitap Alamamamızı sağlıyor...
-            if (user.BorrowBooks.Count > 2)
+            try
             {
-                throw new InvalidOperationException("Daha Fazla Ödünç Kitap Alamazsınız.Başka kitapları Ödünç Alabilmek İçin Lütfen Ödünç Listenizden kitap çıkarın.");
-
-            }
-            // Kitabın zaten ReadOutBooks listesinde olup olmadığını kontrol edin
-
-            bool alreadyRead = user.ReadOutBooks.Contains(bookName);
-            if (alreadyRead)
-            {
-                throw new InvalidOperationException("Bu kitabı zaten okudunuz.");
-            }
-
-            // Henüz orada değilse, kitabı Ödünç Kitaplar listesine ekleyin
-
-            if (!user.BorrowBooks.Contains(bookName))
-            {
-                var borrowBooksList = user.BorrowBooks.ToList();
-                borrowBooksList.Add(bookName);
-                book.Stock -= 1;
-
-                // Kitap kullanılabilirliğini yeni stok düzeyine göre güncelleyin
-
-                if (book.Stock <= 0)
-                {
-                    book.IsAvailable = false;
-                }
-               
-                var userResponse = new User
-                {
-                    Id = user.Id,
-                    FullName = user.FullName,
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    gender = user.gender,
-                    avatarUrl = user.avatarUrl,
-                    ReadOutBooks = user.ReadOutBooks,
-                    Password = user.Password,
-                    BorrowBooks = borrowBooksList
-                };
-
-                var updateResult = await _userRepository.UpdateUserAsync(user.Id, userResponse);
-                var bookUpdateResult = await _bookRepository.UpdateBookAsync(book.Id, book);
-
-                if (updateResult == null)
+                // Kullanıcı bilgilerini güncelle
+                var updateUserResult = await _userRepository.UpdateUserAsync(user.Id, user);
+                if (updateUserResult == null)
                 {
                     throw new Exception("Kullanıcı güncellenemedi");
                 }
 
-                // Start a task to automatically return the book after 30 days
+                // Kitap bilgilerini güncelle
+                var bookUpdateResult = await _bookRepository.UpdateBookAsync(book.Id, book);
+                if (bookUpdateResult == null)
+                {
+                    throw new Exception("Kitap güncellenemedi");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Güncelleme işlemi başarısız", ex);
+            }
+
+            return user;
+        }
+
+
+
+
+        public async Task AddBorrowedBookAsync(BorrowBookByNameDto bookDto, string userName)
+        {
+            var user = await _userRepository.GetByNameAsync(userName); // Kullanıcıyı kullanıcı adına göre bul
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+            }
+
+            var bookName = bookDto.bookName;
+            var book = await _bookRepository.FindBookByNameAsync(bookName); // Kitabı isme göre bul
+
+            if (book == null)
+            {
+                throw new KeyNotFoundException("Böyle bir kitap bulunamadı.");
+            }
+
+            if (user.BorrowBooks.Count > 2)
+            {
+                throw new InvalidOperationException("Daha Fazla Ödünç Kitap Alamazsınız. Başka kitapları ödünç alabilmek için lütfen ödünç listenizden kitap çıkarın.");
+            }
+
+            if (user.ReadOutBooks.Any(b => string.Equals(b, bookName, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new InvalidOperationException("Bu kitabı zaten okudunuz.");
+            }
+
+            var borrowedBook = user.BorrowBooks.FirstOrDefault(b => string.Equals(b.BookName, bookName, StringComparison.OrdinalIgnoreCase));
+
+            if (borrowedBook == null)
+            {
+                // Kitap henüz kullanıcı tarafından ödünç alınmadıysa, ekleyin ve IsAvailable durumunu false yapın
+                borrowedBook = new BorrowedBook
+                {
+                    BookName = bookName,
+                    IsAvailable = false // Bu kullanıcı için kitabı artık ödünç aldı
+                };
+                user.BorrowBooks.Add(borrowedBook);
+
+                // Kitap stoğunu azalt
+                book.Stock -= 1;
+
+                // Eğer stok bitti ve kitap daha önce mevcutsa IsAvailable durumunu false yap
+                if (book.Stock <= 0)
+                {
+                    book.IsAvailable = false;
+                }
+
+                var updateUserTask = await _userRepository.UpdateUserAsync(user.Id, user);
+
+                if (updateUserTask == null)
+                {
+                    throw new Exception("Kullanıcı güncellenemedi");
+                }
+
+                var updateBookTask = await _bookRepository.UpdateBookAsync(book.Id, book);
+
+                if (updateBookTask == null)
+                {
+                    throw new Exception("Kitap güncellenemedi");
+                }
+
+                // 30 gün sonra kitabı otomatik olarak iade etme işlemini başlat
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromDays(30));
                     await RemoveBookAsync(bookDto, userName);
                 });
             }
-        }
-
-
-
-
-        public async Task<bool> IsBookAvailableAsync(BorrowBookByNameDto bookDto, string userName)
-        {
-
-            //  var token = _contextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
-            //// var redisToken = _memoryCache.Get("Bearer").ToString();
-            // var tokenHandler = new JwtSecurityTokenHandler();
-            // var jwtToken = tokenHandler.ReadJwtToken(redisToken);
-
-            // var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
-           // ObjectId userId = new ObjectId(id);
-            User user = await _userRepository.GetByNameAsync(userName);
-
-            //     var user = await GetByIdAsync(id);
-          // ObjectId bookIdr = new ObjectId(bookIdR.Id);
-          var bookName = bookDto.bookName;
-            if (user.BorrowBooks.Contains(bookName))
+            else
             {
-                throw new Exception("Kitap önceden ödünç alınmış");
+                throw new InvalidOperationException("Bu kitabı zaten ödünç aldınız.");
             }
-            return true;
         }
+
+
         public async Task AddtoReadoutBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
-            //userı kullanıcı adına göre bul
+            // Kullanıcıyı kullanıcı adına göre bul
             User user = await _userRepository.GetByNameAsync(userName);
 
             if (user == null)
             {
-                throw new KeyNotFoundException("Kullanıcı bulunamadı."); 
+                throw new KeyNotFoundException("Kullanıcı bulunamadı.");
             }
 
-            // Dto'dan kitap adını çek
+            // DTO'dan kitap adını çek
             var bookName = bookDto.bookName;
 
-            // ödünç alınanlarda mı diye Kontrol
-            if (user.BorrowBooks.Contains(bookName))
+            // Kullanıcının ödünç aldığı kitaplar arasında kitabın olup olmadığını kontrol et
+            var borrowedBook = user.BorrowBooks.FirstOrDefault(b => string.Equals(b.BookName, bookName, StringComparison.OrdinalIgnoreCase));
+
+            if (borrowedBook != null)
             {
-                var borrowBooksList = user.BorrowBooks.ToList();
-                var readOutBooksList = user.ReadOutBooks.ToList();
+                // Kitabı ödünç kitaplar listesinden çıkar
+                user.BorrowBooks.Remove(borrowedBook);
 
-                // Ödünç Listesinden Kaldır
-                borrowBooksList.Remove(bookName);
-
-                // Okunanlarda değilse okunanlara ekle
-                if (!readOutBooksList.Contains(bookName))
+                // Kitap daha önce okunanlar listesinde değilse, okunanlara ekle
+                if (!user.ReadOutBooks.Contains(bookName))
                 {
-                    readOutBooksList.Add(bookName);
+                    user.ReadOutBooks.Add(bookName);
                 }
                 else
                 {
                     Console.WriteLine("Kitap zaten okunanlar listesinde mevcut.");
                 }
 
-                // userın listesinin güncelle
-                user.BorrowBooks = borrowBooksList;
-                user.ReadOutBooks = readOutBooksList;
-
-                try
+                // Kitap bilgilerini güncelle
+                var book = await _bookRepository.FindBookByNameAsync(bookName);
+                if (book != null)
                 {
-                    // user infosu güncelle
-                    var updateResult = await _userRepository.UpdateUserAsync(user.Id, user);
-                    Console.WriteLine("Okunan kitap listesi güncellendi.");
-
-                    // stok ve mevcudiyeti güncelle
-                    var book = await _bookRepository.FindBookByNameAsync(bookName);
-                    if (book != null)
+                    // Kitap stoğunu artır ve mevcut değilse IsAvailable'ı true yap
+                    book.Stock += 1;
+                    if (!book.IsAvailable)
                     {
-                        book.Stock += 1;
+                        book.IsAvailable = true;
+                    }
 
-                        // önceden mevcut değilse ve iade edilince stok açıldıysa IsAvailable ı true döndür
-                        if (!book.IsAvailable && book.Stock > 0)
+                    try
+                    {
+                        // Kullanıcı bilgilerini güncelle
+                        var updateUserResult = await _userRepository.UpdateUserAsync(user.Id, user);
+                        if (updateUserResult == null)
                         {
-                            book.IsAvailable = true;
+                            throw new Exception("Kullanıcı güncellenemedi");
                         }
 
+                        // Kitap bilgilerini güncelle
                         var bookUpdateResult = await _bookRepository.UpdateBookAsync(book.Id, book);
                         if (bookUpdateResult == null)
                         {
                             throw new Exception("Kitap güncellenemedi");
                         }
+
+                        Console.WriteLine("Okunan kitap listesi güncellendi.");
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Güncelleme işlemi başarısız", ex);
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    throw new Exception("Güncelleme işlemi başarısız", ex);
+                    throw new KeyNotFoundException("Böyle bir kitap bulunamadı.");
                 }
             }
             else
@@ -336,6 +339,8 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 throw new InvalidOperationException("Kitap kullanıcı tarafından ödünç alınmamış.");
             }
         }
+
+
 
 
 
