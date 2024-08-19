@@ -56,7 +56,7 @@ namespace BookLibary.Api.Controllers
             catch (InvalidOperationException ex)
             {
                 // Bu durumda kitap zaten okundu ama yine de ödünç alındı
-                return Ok(new { message = ex.Message + " Kitap ödünç alındı." });
+                return Ok(new { message = ex.Message});
             }
             catch (KeyNotFoundException ex)
             {
