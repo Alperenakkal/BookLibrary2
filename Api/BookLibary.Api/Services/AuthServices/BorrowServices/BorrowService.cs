@@ -191,46 +191,41 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
 
         public async Task AddBorrowedBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
-            var user = await _userRepository.GetByNameAsync(userName); // Kullanıcıyı kullanıcı adına göre bul
+            var user = await _userRepository.GetByNameAsync(userName); 
             if (user == null)
             {
-                throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+                throw new KeyNotFoundException("Kullanıcı Bulunamadı");
             }
 
             var bookName = bookDto.bookName;
-            var book = await _bookRepository.FindBookByNameAsync(bookName); // Kitabı isme göre bul
+            var book = await _bookRepository.FindBookByNameAsync(bookName); 
 
             if (book == null)
             {
-                throw new KeyNotFoundException("Böyle bir kitap bulunamadı.");
+                throw new KeyNotFoundException("Kitap Bulunumadı");
             }
 
             if (user.BorrowBooks.Count > 2)
             {
-                throw new InvalidOperationException("Daha Fazla Ödünç Kitap Alamazsınız. Başka kitapları ödünç alabilmek için lütfen ödünç listenizden kitap çıkarın.");
+                throw new InvalidOperationException("Daha Fazla Kitap Ödünç Alamazsınız. Lütfen Kitap İade Edin");
             }
-
-            if (user.ReadOutBooks.Any(b => string.Equals(b, bookName, StringComparison.OrdinalIgnoreCase)))
-            {
-                throw new InvalidOperationException("Bu kitabı zaten okudunuz.");
-            }
-
+          
             var borrowedBook = user.BorrowBooks.FirstOrDefault(b => string.Equals(b.BookName, bookName, StringComparison.OrdinalIgnoreCase));
 
             if (borrowedBook == null)
             {
-                // Kitap henüz kullanıcı tarafından ödünç alınmadıysa, ekleyin ve IsAvailable durumunu false yapın
+               
                 borrowedBook = new BorrowedBook
                 {
                     BookName = bookName,
-                    IsAvailable = false // Bu kullanıcı için kitabı artık ödünç aldı
+                    IsAvailable = false 
                 };
                 user.BorrowBooks.Add(borrowedBook);
 
-                // Kitap stoğunu azalt
+             
                 book.Stock -= 1;
 
-                // Eğer stok bitti ve kitap daha önce mevcutsa IsAvailable durumunu false yap
+              
                 if (book.Stock <= 0)
                 {
                     book.IsAvailable = false;
@@ -240,28 +235,26 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
 
                 if (updateUserTask == null)
                 {
-                    throw new Exception("Kullanıcı güncellenemedi");
+                    throw new Exception("Kullanıcı Güncellenemedi");
                 }
 
                 var updateBookTask = await _bookRepository.UpdateBookAsync(book.Id, book);
 
                 if (updateBookTask == null)
                 {
-                    throw new Exception("Kitap güncellenemedi");
+                    throw new Exception("Kitap Güncellenemedi");
                 }
 
-                // 30 gün sonra kitabı otomatik olarak iade etme işlemini başlat
+                
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromDays(30));
                     await RemoveBookAsync(bookDto, userName);
                 });
             }
-            else
-            {
-                throw new InvalidOperationException("Bu kitabı zaten ödünç aldınız.");
-            }
         }
+
+
 
 
         public async Task AddtoReadoutBookAsync(BorrowBookByNameDto bookDto, string userName)
