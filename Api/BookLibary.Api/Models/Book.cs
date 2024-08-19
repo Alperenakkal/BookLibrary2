@@ -26,5 +26,8 @@ namespace BookLibary.Api.Models
         public int Stock { get; set; }
         [BsonElement("IsAvailable")]
         public bool IsAvailable { get; set; }
+
+        [BsonElement("Description")]
+        public string Description { get; set; }
     }
 }
