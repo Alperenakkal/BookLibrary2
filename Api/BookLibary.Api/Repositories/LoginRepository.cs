@@ -166,25 +166,28 @@ namespace BookLibary.Api.Repositories
             try
             {
                 var filter = Builders<User>.Filter.Eq(x => x.UserName, userName);
-                var update = Builders<User>.Update.Pull(u => u.BorrowBooks, bookDto.bookName);
+
+                // BorrowedBook nesnesi üzerinden filtreleme yaparak eşleşen kitabı kaldır
+                var update = Builders<User>.Update.PullFilter(u => u.BorrowBooks, b => b.BookName == bookDto.bookName);
 
                 var result = await _model.UpdateOneAsync(filter, update);
 
                 if (result.IsAcknowledged && result.ModifiedCount > 0)
                 {
-                 
+                    // Güncellenmiş kullanıcıyı döndür
                     return await _model.Find(filter).FirstOrDefaultAsync();
                 }
                 else
                 {
-                    throw new Exception("Book not removed or user not found");
+                    throw new Exception("Kitap kaldırılmadı veya kullanıcı bulunamadı");
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Update Error", ex);
+                throw new Exception("Güncelleme hatası", ex);
             }
         }
+
     }
 
 }

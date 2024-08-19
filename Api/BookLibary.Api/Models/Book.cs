@@ -2,29 +2,29 @@
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace BookLibary.Api.Models
- {
-     public class Book:IBook
-     {
-         [BsonId]
+{
+    public class Book : IBook
+    {
+        [BsonId]
+        public ObjectId Id { get; set; }
 
-         public ObjectId Id { get; set; }
+        [BsonElement("BookName")]
+        public string BookName { get; set; } = string.Empty;
 
-         [BsonElement("BookName")]
-         public  string BookName { get; set; } = string.Empty;
-         [BsonElement("Publisher")]
+        [BsonElement("Publisher")]
+        public string? Publisher { get; set; }
 
-         public string? Publisher {get; set;}
-         [BsonElement("Author")]
+        [BsonElement("Author")]
+        public string? Author { get; set; }
 
-         public string? Author { get; set; }
-         [BsonElement("IsAvailable")]
-
-         public bool IsAvailable { get; set; }
-        public int Stock { get; set; }
+        [BsonElement("CoverImageUrl")]
         public string CoverImageUrl { get; set; }
 
+        [BsonElement("Category")]
         public string Category { get; set; }
-
-
-     }
- }
+        [BsonElement("Stock")]
+        public int Stock { get; set; }
+        [BsonElement("IsAvailable")]
+        public bool IsAvailable { get; set; }
+    }
+}
