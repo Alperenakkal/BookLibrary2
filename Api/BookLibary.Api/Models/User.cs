@@ -14,7 +14,12 @@ namespace BookLibary.Api.Models
     public class BorrowedBook
     {
         public string BookName { get; set; } = string.Empty;
-        public bool IsAvailable { get; set; } = true; // Kullanıcı için varsayılan olarak true
+        public bool IsAvailable { get; set; } = true; 
+    }
+    public class ReadoutBook
+    {
+        public string BookName { get; set; }
+        public int BorrowCount { get; set; }
     }
 
     public class User:IUser
@@ -35,7 +40,7 @@ namespace BookLibary.Api.Models
         public List<BorrowedBook> BorrowBooks { get; set; } = new List<BorrowedBook>();
 
         [BsonElement("ReadOutBooks")]
-        public List<string> ReadOutBooks { get; set; } = new List<string>();
+        public List<ReadoutBook> ReadOutBooks { get; set; } = new List<ReadoutBook>();
 
         [BsonElement("Admin")]
         public bool IsAdmin { get; set; }
