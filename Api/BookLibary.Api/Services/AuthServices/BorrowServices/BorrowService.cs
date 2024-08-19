@@ -194,68 +194,78 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
 
         public async Task AddBorrowedBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
-            var user = await _userRepository.GetByNameAsync(userName); 
+            var user = await _userRepository.GetByNameAsync(userName);
             if (user == null)
             {
                 throw new KeyNotFoundException("Kullanıcı Bulunamadı");
             }
 
             var bookName = bookDto.bookName;
-            var book = await _bookRepository.FindBookByNameAsync(bookName); 
+            var book = await _bookRepository.FindBookByNameAsync(bookName);
 
             if (book == null)
             {
-                throw new KeyNotFoundException("Kitap Bulunumadı");
+                throw new KeyNotFoundException("Kitap Bulunamadı");
             }
 
-            if (user.BorrowBooks.Count > 2)
+            // Check if the book is already in the user's ReadOutBooks list and if BorrowCount has reached 3
+            var readOutBook = user.ReadOutBooks.FirstOrDefault(b => string.Equals(b.BookName, bookName, StringComparison.OrdinalIgnoreCase));
+            if (readOutBook != null && readOutBook.BorrowCount >= 3)
             {
-                throw new InvalidOperationException("Daha Fazla Kitap Ödünç Alamazsınız. Lütfen Kitap İade Edin");
+                throw new InvalidOperationException("Bu kitabı artık ödünç alamazsınız, maksimum ödünç alma sayısına ulaştınız.");
             }
-          
+
+            // Check if the user has already borrowed 3 books
+            if (user.BorrowBooks.Count >= 3)
+            {
+                throw new InvalidOperationException("Daha Fazla Kitap Ödünç Alamazsınız. Lütfen Kitap İade Edin.");
+            }
+
             var borrowedBook = user.BorrowBooks.FirstOrDefault(b => string.Equals(b.BookName, bookName, StringComparison.OrdinalIgnoreCase));
 
             if (borrowedBook == null)
             {
-               
                 borrowedBook = new BorrowedBook
                 {
                     BookName = bookName,
-                    IsAvailable = false 
+                    IsAvailable = false
                 };
                 user.BorrowBooks.Add(borrowedBook);
 
-             
+                // Decrease the book stock
                 book.Stock -= 1;
 
-              
+                // Mark book as unavailable if out of stock
                 if (book.Stock <= 0)
                 {
                     book.IsAvailable = false;
                 }
 
                 var updateUserTask = await _userRepository.UpdateUserAsync(user.Id, user);
-
                 if (updateUserTask == null)
                 {
                     throw new Exception("Kullanıcı Güncellenemedi");
                 }
 
                 var updateBookTask = await _bookRepository.UpdateBookAsync(book.Id, book);
-
                 if (updateBookTask == null)
                 {
                     throw new Exception("Kitap Güncellenemedi");
                 }
 
-                
+                // Schedule automatic return of the book after 30 days
                 _ = Task.Run(async () =>
                 {
                     await Task.Delay(TimeSpan.FromDays(30));
                     await RemoveBookAsync(bookDto, userName);
                 });
             }
+            else
+            {
+                throw new InvalidOperationException("Kitap zaten kullanıcı tarafından ödünç alınmış.");
+            }
         }
+
 
 
 
@@ -368,6 +378,13 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
 
                 if (readOutBook != null)
                 {
+                    // If BorrowCount is 3, throw an exception to prevent further borrowing
+                    if (readOutBook.BorrowCount >= 3)
+                    {
+                        throw new InvalidOperationException("Bu kitapı artık ödünç alamazsınız, maksimum ödünç alma sayısına ulaştınız.");
+                    }
+
+                    // Increment the borrow count
                     readOutBook.BorrowCount++;
                 }
                 else
@@ -378,6 +395,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                         BorrowCount = 1
                     });
                 }
+
                 var book = await _bookRepository.FindBookByNameAsync(bookName);
                 if (book != null)
                 {
@@ -416,6 +434,7 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                 throw new InvalidOperationException("Kitap kullanıcı tarafından ödünç alınmamış.");
             }
         }
+
 
 
 
