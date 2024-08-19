@@ -1,5 +1,6 @@
 ﻿using BookLibary.Api.Dtos;
 using BookLibary.Api.Dtos.UserDto;
+
 using BookLibary.Api.Models;
 using BookLibary.Api.Models.Request.UserRequest;
 using BookLibary.Api.Models.Response.UserResponse;
@@ -31,7 +32,6 @@ namespace BookLibary.Api.Controllers
         public async Task<IActionResult> GetByName(string name)
         {
             User username = await _service.GetByNameAsync(name);
-            if (username == null) { return NotFound("Kullanıcı bulunamadi"); }
             return Ok(username);
         }
         [HttpGet("GetByEmail/{mail}")]

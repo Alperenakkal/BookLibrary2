@@ -10,6 +10,7 @@ using BookLibary.Api.Services.AuthServices.TokenServices;
 using BookLibary.Api.Services.AuthServices.UpdateServices;
 using BookLibary.Api.Services.AuthServices.EmailServices;
 using BookLibary.Api.Services.AuthServices;
+using BookLibary.Api.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -43,6 +44,7 @@ public class Startup
         services.AddScoped<IRegisterService, RegisterService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IIdentityService,IdentityService>();
+     
         services.AddHttpContextAccessor();
         services.AddMemoryCache();
 
@@ -119,6 +121,7 @@ public class Startup
 
         // CORS politikalarını uygulama
         app.UseCors("AllowSpecificOrigin");
+        app.UseMiddleware<ErrorHandlerMiddleware>();
 
         app.UseRouting();
 
