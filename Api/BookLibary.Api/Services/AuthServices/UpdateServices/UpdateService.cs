@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using BookLibary.Api.Dtos.UserDto;
+using BookLibary.Api.Middleware;
 using BookLibary.Api.Models;
 using BookLibary.Api.Models.Request.UserRequest;
 using BookLibary.Api.Models.Response.UserResponse;
@@ -44,8 +45,7 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
             }
             catch (Exception ex)
             {
-
-                throw new Exception("Kullanici sifre islemi basarisiz",ex);
+                throw new NotFoundException($"{name} profiliniz güncellenemedi");
             }
     }
 
@@ -59,8 +59,8 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
           
             if (string.IsNullOrEmpty(userId))
         {
-            throw new InvalidOperationException("User ID token'dan alınamadı");
-        }
+                throw new BadRequestException($"Tokendan userId alinamadi");
+            }
 
   
             var url = "";
@@ -106,8 +106,8 @@ namespace BookLibary.Api.Services.AuthServices.UpdateServices
         }
         catch (Exception ex)
         {
-            throw new Exception("Güncelleme işlemi başarısız", ex);
-        }
+                throw new BadRequestException($"{ex} güncelleme işlemi başarısız");
+            }
         }
     }
 }
