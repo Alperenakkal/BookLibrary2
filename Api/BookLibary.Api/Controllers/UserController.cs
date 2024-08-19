@@ -38,27 +38,15 @@ namespace BookLibary.Api.Controllers
         public async Task <IActionResult> GetByEmail(string mail)
         {
             User email = await _service.GetByEmailAsync(mail);
-            if (email == null) { return NotFound("Bu email adresine ait kullanici bulunamadi"); };
             return Ok(email);
                     
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Login([FromBody]LoginDto model)
-        {
-            if (model == null || model.UserName == "" || model.Password == "")
-            { return BadRequest("İlgili alanlar boş bırakılmaz"); }
-            User user = await _service.GetByNameAsync(model.UserName);
-            if (user == null) { return BadRequest("Girmis olduğunuz kullanici adi bilgisi yanlistir"); }
-            if (user.Password != model.Password) { return BadRequest("Şifre yanlis"); }
-            return Ok("Giris islemi basarili");
-        }
         [HttpPost("LoginUser")]
         [AllowAnonymous]
         public async Task<ActionResult<LoginResponse>> LoginUserAsync([FromBody] LoginRequest request)
         {
             var result = await _service.LoginUserAsync(request);
-
             return result;
         }
         [HttpPost("logout")]
@@ -66,7 +54,7 @@ namespace BookLibary.Api.Controllers
         {
             await _service.LogoutUserAsync();
             _memoryCache.Remove("Bearer");
-            return Ok(new { message = "Kullanici cikisi basarili" });
+            return Ok();
         }
         [HttpPut("UpdateUser/{userId}")]
 

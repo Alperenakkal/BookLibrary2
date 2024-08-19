@@ -63,7 +63,7 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
 
             if ((string.IsNullOrEmpty(request.Username) && (string.IsNullOrEmpty(request.Email)) || string.IsNullOrEmpty(request.Password)))
             {
-                throw new ArgumentException("Username and Password cannot be null or empty.");
+                throw new BadRequestException($"Alanlar boş bırakılmaz");
             }
 
 
@@ -98,13 +98,6 @@ namespace BookLibary.Api.Services.AuthServices.LoginServices
             {
                 response.AuthenticateResult = false;
             }
-
-
-
-
-
-
-
             return response;
         }
 
