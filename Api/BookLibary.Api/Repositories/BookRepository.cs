@@ -116,12 +116,7 @@ using BookLibary.Api.Models;
         public async Task<Book> UpdateBookAsync(ObjectId id, Book updatedBook)
         {
             var filter = Builders<Book>.Filter.Eq(b => b.Id, id);
-            var update = Builders<Book>.Update
-                .Set(b => b.AverageRating, updatedBook.AverageRating)
-                .Set(b => b.TotalRating, updatedBook.TotalRating)
-                .Set(b => b.RatingCount, updatedBook.RatingCount);
-
-            var result = await _collection.UpdateOneAsync(filter, update);
+            var result = await _collection.ReplaceOneAsync(filter, updatedBook);
             return result.IsAcknowledged && result.ModifiedCount > 0 ? updatedBook : null;
         }
 
