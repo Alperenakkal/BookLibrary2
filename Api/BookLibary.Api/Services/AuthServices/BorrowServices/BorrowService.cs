@@ -122,9 +122,10 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             {
                 dto.Id = user.Id;
             }
+
             catch (Exception ex)
             {
-                throw new Exception("Güncelleme işlemi başarısız", ex);
+                throw new Exception("Güncelleme işlemi başarısızzz", ex);
             }
             return await _repository.ReplaceOneAsync(user, id.ToString());
         }
