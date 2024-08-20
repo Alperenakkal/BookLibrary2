@@ -60,6 +60,9 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                         IsAvailable = borrowedBook.IsAvailable,
                         Stock = book.Stock,
                         Category = book.Category,
+                        TotalRating = book.TotalRating,
+                        RatingCount = book.RatingCount,
+                        AverageRating = book.AverageRating,
                     };
                     bookList.Add(bookResponse);
                 }
