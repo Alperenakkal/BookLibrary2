@@ -117,7 +117,7 @@ using BookLibary.Api.Models;
         {
             var filter = Builders<Book>.Filter.Eq(b => b.Id, id);
             var update = Builders<Book>.Update
-                .Set(b => b.AverageRating, updatedBook. )
+                .Set(b => b.AverageRating, updatedBook.AverageRating)
                 .Set(b => b.TotalRating, updatedBook.TotalRating)
                 .Set(b => b.RatingCount, updatedBook.RatingCount);
 
