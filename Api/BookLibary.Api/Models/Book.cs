@@ -1,5 +1,6 @@
-﻿using MongoDB.Bson;
+﻿using BookLibary.Api.Models;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
 
 namespace BookLibary.Api.Models
 {
@@ -22,12 +23,23 @@ namespace BookLibary.Api.Models
 
         [BsonElement("Category")]
         public string Category { get; set; }
+
         [BsonElement("Stock")]
         public int Stock { get; set; }
+
         [BsonElement("IsAvailable")]
         public bool IsAvailable { get; set; }
 
         [BsonElement("Description")]
         public string Description { get; set; }
+
+        [BsonElement("AverageRating")]
+        public double AverageRating { get; set; }
+
+        [BsonElement("RatingCount")]
+        public int RatingCount { get; set; }
+
+        [BsonElement("TotalRating")]
+        public double TotalRating { get; set; }
     }
 }
