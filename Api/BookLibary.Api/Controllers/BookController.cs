@@ -2,6 +2,7 @@
 using BookLibary.Api.Models;
 using BookLibary.Api.Services.AuthServices.BookServices;
 using BookLibary.Api.Dtos.BookDto;
+using System.Threading.Tasks;
 
 namespace BookLibary.Api.Controllers
 {
@@ -19,7 +20,6 @@ namespace BookLibary.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllBooks()
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -42,6 +42,7 @@ namespace BookLibary.Api.Controllers
             }
             return Ok(result);
         }
+
         [HttpGet("Name/{name}")]
         public async Task<IActionResult> GetByName(string name)
         {
@@ -56,14 +57,12 @@ namespace BookLibary.Api.Controllers
             if (result == null)
             {
                 return BadRequest(new { Message = "Kitap Eklenemedi " });
-
             }
             return Ok(CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book));
         }
 
-        
         [HttpDelete("{bookName}")]
-        public async Task<IActionResult> DeleteBook(string bookName) 
+        public async Task<IActionResult> DeleteBook(string bookName)
         {
             var result = await _bookService.DeleteBook(bookName);
             if (result.Success)
@@ -72,6 +71,18 @@ namespace BookLibary.Api.Controllers
             }
             return NotFound(new { Message = "Kitap Silinemedi" });
         }
-    }
 
+        [HttpPost("rate-book")]
+        public async Task<IActionResult> RateBook([FromBody] RateBookRequest request)
+        {
+            var result = await _bookService.RateBookAsync(request);
+            if (!result.Success)
+            {
+                return NotFound(new { Message = result.Message });
+            }
+            return Ok(new { message = "Puan kaydedildi.", averageRating = result.AverageRating });
+        }
+
+
+    }
 }

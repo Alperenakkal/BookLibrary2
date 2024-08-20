@@ -79,16 +79,19 @@ using BookLibary.Api.Models;
 
         public async Task<Book> GetByIdAsync(string _id)
         {
-            var objectId = new ObjectId(_id);
+            if (!ObjectId.TryParse(_id, out ObjectId objectId))
+            {
+                throw new ArgumentException("Geçersiz ID formatı");
+            }
+
             try
             {
                 var filter = Builders<Book>.Filter.Eq("_id", objectId);
                 return await _collection.Find(filter).FirstOrDefaultAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw new Exception("Id getirme işlemi başarısız");
+                throw new Exception("Id getirme işlemi başarısız: " + ex.Message);
             }
         }
         public async Task<Book> GetByNameAsync(string name)
@@ -113,9 +116,16 @@ using BookLibary.Api.Models;
         public async Task<Book> UpdateBookAsync(ObjectId id, Book updatedBook)
         {
             var filter = Builders<Book>.Filter.Eq(b => b.Id, id);
-            var result = await _collection.ReplaceOneAsync(filter, updatedBook);
+            var update = Builders<Book>.Update
+                .Set(b => b.AverageRating, updatedBook. )
+                .Set(b => b.TotalRating, updatedBook.TotalRating)
+                .Set(b => b.RatingCount, updatedBook.RatingCount);
+
+            var result = await _collection.UpdateOneAsync(filter, update);
             return result.IsAcknowledged && result.ModifiedCount > 0 ? updatedBook : null;
         }
+
+
 
     }
 } 
