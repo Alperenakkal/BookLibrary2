@@ -4,13 +4,18 @@ using MongoDB.Bson;
 
 namespace BookLibary.Api.Models
 {
+    public class UserRating
+    {
+        public string UserName { get; set; }
+        public double Rating { get; set; }
+    }
     public class Book : IBook
     {
         [BsonId]
         public ObjectId Id { get; set; }
 
         [BsonElement("BookName")]
-        public string BookName { get; set; } = string.Empty;
+        public string BookName { get; set; } 
 
         [BsonElement("Publisher")]
         public string? Publisher { get; set; }
@@ -38,8 +43,8 @@ namespace BookLibary.Api.Models
 
         [BsonElement("RatingCount")]
         public int RatingCount { get; set; }
+        public List<Ratings> Ratings { get; set; }
 
-        [BsonElement("TotalRating")]
-        public double TotalRating { get; set; }
+
     }
 }

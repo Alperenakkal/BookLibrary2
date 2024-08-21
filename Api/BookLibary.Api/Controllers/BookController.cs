@@ -97,16 +97,16 @@ namespace BookLibary.Api.Controllers
             return NotFound(new { Message = "Kitap Silinemedi" });
         }
 
-        //[HttpPost("rate-book")]
-        //public async Task<IActionResult> RateBook([FromBody] RateBookRequest request)
-        //{
-        //    var result = await _bookService.RateBookAsync(request);
-        //    if (!result.Success)
-        //    {
-        //        return NotFound(new { Message = result.Message });
-        //    }
-        //    return Ok(new { message = "Puan kaydedildi.", averageRating = result.AverageRating });
-        //}
+       [HttpPost("rate-book")]
+        public async Task<IActionResult> RateBook([FromBody] RateBookRequest request,string userName)
+        {
+            var result = await _bookService.RateBookAsync(request,userName);
+            if (!result.Success)
+            {
+             return NotFound(new { Message = result.Message });
+            }
+           return Ok(new { message = "Puan kaydedildi.", averageRating = result.AverageRating });
+        }
 
 
     }

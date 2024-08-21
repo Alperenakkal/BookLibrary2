@@ -4,7 +4,8 @@ namespace BookLibary.Api.Models
 {
     public class RateBookRequest 
     {
-        public string BookId { get; set; }
+     //   public string UserName { get; set; }
+        public string BookName { get; set; }
         public double Rating { get; set; }
     }
 

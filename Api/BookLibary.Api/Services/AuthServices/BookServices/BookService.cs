@@ -1,6 +1,7 @@
 ﻿using BookLibary.Api.Dtos.BookDto;
 using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
+using DnsClient;
 using MongoDB.Bson;
 using System.Threading.Tasks;
 
@@ -9,10 +10,12 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
     public class BookService : IBookService
     {
         private readonly IBookRepository<Book> _bookRepository;
+        private readonly IUserRepository<User> _userRepository;
 
-        public BookService(IBookRepository<Book> bookRepository)
+        public BookService(IBookRepository<Book> bookRepository, IUserRepository<User> userRepository)
         {
             _bookRepository = bookRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<Book> CreateBookAsync(Book book)
@@ -40,38 +43,89 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
             return await _bookRepository.GetByNameAsync(name);
         }
 
-        //public async Task<RateBookResultDto> RateBookAsync(RateBookRequest request)
-        //{
-        //    if (!ObjectId.TryParse(request.BookId, out ObjectId objectId))
-        //    {
-        //        return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Geçersiz kitap ID'si" };
-        //    }
+        public async Task<RateBookResultDto> RateBookAsync(RateBookRequest request, string UserName)
+        {
+            User user = await _userRepository.GetByNameAsync(UserName);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+            }
 
-        //    var book = await _bookRepository.GetByIdAsync(request.BookId);
-        //    if (book == null)
-        //    {
-        //        return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Kitap bulunamadı" };
-        //    }
+            // Validate BookName
+            if (string.IsNullOrEmpty(request.BookName))
+            {
+                return new RateBookResultDto
+                {
+                    Success = false,
+                    Message = "Book name cannot be empty."
+                };
+            }
 
-        //    book.RatingCount++;
-        //    book.TotalRating += request.Rating;
-        //    book.AverageRating = book.TotalRating / book.RatingCount;
+            // Validate Rating value
+            if (request.Rating < 1.0 || request.Rating > 5.0)
+            {
+                return new RateBookResultDto
+                {
+                    Success = false,
+                    Message = "Rating must be between 1.0 and 5.0."
+                };
+            }
 
-        //    var updatedBook = await _bookRepository.UpdateBookAsync(objectId, book);
+            // Fetch the book by name
+            var book = await _bookRepository.GetBookByNameAsync(request.BookName);
 
-        //    if (updatedBook != null)
-        //    {
-        //        return new RateBookResultDto
-        //        {
-        //            Success = true,
-        //            AverageRating = updatedBook.AverageRating
-        //        };
-        //    }
+            // Check if the book exists
+            if (book == null)
+            {
+                return new RateBookResultDto
+                {
+                    Success = false,
+                    Message = "Book not found."
+                };
+            }
 
-        //    return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Kitap güncelleme işlemi başarısız" };
-        //}
+            // Check if the user has already rated this book
+            if (book.Ratings.Any(r => r.UserName == UserName))
+            {
+                return new RateBookResultDto
+                {
+                    Success = false,
+                    Message = "You have already rated this book."
+                };
+            }
 
+            // Initialize the Ratings list if it's null (just in case)
+            if (book.Ratings == null)
+            {
+                book.Ratings = new List<Ratings>();
+            }
 
+            // Add the new rating to the Ratings list
+            book.Ratings.Add(new Ratings
+            {
+                UserName = UserName,
+                Value = request.Rating
+            });
+
+            // Update the RatingCount
+            book.RatingCount = book.Ratings.Count;
+
+            // Calculate the new AverageRating
+            book.AverageRating = book.Ratings.Average(r => r.Value);
+
+            // Update the book with the new rating information
+            await _bookRepository.UpdateBookAsync(book.Id, book);
+
+            // Return the result
+            return new RateBookResultDto
+            {
+                Success = true,
+                AverageRating = book.AverageRating,
+                Message = "Rating successfully added."
+            };
+        }
+
+    
     }
 
 }
