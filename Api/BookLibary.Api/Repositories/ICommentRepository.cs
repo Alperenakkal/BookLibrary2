@@ -7,5 +7,6 @@ namespace BookLibary.Api.Repositories
     {
         Task<T> InsertOneAsync(Comments comment);
         Task<List<T>> GetCommentByBookName(string bookName);
+        Task<T> GetCommentByBookUserName(string userName);
     }
 }

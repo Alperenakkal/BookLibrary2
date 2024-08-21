@@ -9,5 +9,6 @@ namespace BookLibary.Api.Services.AuthServices.CommentService
     {
         Task<AddCommentResponse> CreateCommentAsync(string bookName, AddCommentRequest comment);
        Task<List<BookCommentDto>> GetCommentByBookName(string bookName);
+       Task<BookCommentDto> GetCommentByUserName(string userName);
     }
 }
