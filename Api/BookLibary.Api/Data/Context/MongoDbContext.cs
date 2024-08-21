@@ -20,6 +20,7 @@ namespace BookLibary.Api.Data.Context
 
         public IMongoCollection<Book> Books => _database.GetCollection<Book>("Books");
         public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
+        public IMongoCollection<Comments> Comments => _database.GetCollection<Comments>("Comments");
 
     }
 }

@@ -3,6 +3,8 @@ using BookLibary.Api.Models;
 using BookLibary.Api.Services.AuthServices.BookServices;
 using BookLibary.Api.Dtos.BookDto;
 using System.Threading.Tasks;
+using BookLibary.Api.Services.AuthServices.CommentService;
+using BookLibary.Api.Models.Request.CommentRequest;
 
 namespace BookLibary.Api.Controllers
 {
@@ -11,10 +13,11 @@ namespace BookLibary.Api.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
-
-        public BookController(IBookService bookService)
+        private readonly ICommentService _commentService;
+        public BookController(IBookService bookService,ICommentService commentService)
         {
             _bookService = bookService;
+            _commentService = commentService;
         }
 
         [HttpGet]
@@ -49,7 +52,21 @@ namespace BookLibary.Api.Controllers
             var result = await _bookService.GetByNameAsync(name);
             return Ok(result);
         }
+        [HttpPost("addComment/{bookName}")]
+        public async Task<IActionResult> CreateComment(string bookName,[FromBody] AddCommentRequest comments)
+        {
+            var result = await _commentService.CreateCommentAsync(bookName,comments);
+            return Ok(result);
 
+        }
+        [HttpPost("getComment/{bookName}")]
+        public async Task<IActionResult> GetCommentByBookName(string bookName)
+        {
+            var result = await _commentService.GetCommentByBookName(bookName);
+          
+            return Ok(result);
+
+        }
         [HttpPost]
         public async Task<IActionResult> CreateBook([FromBody] Book book)
         {
