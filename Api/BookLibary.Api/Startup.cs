@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using BookLibary.Api.Services.AuthServices.IdentityServices;
+using BookLibary.Api.Services.AuthServices.CommentService;
 
 public class Startup
 {
@@ -44,7 +45,9 @@ public class Startup
         services.AddScoped<IRegisterService, RegisterService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IIdentityService,IdentityService>();
-     
+        services.AddScoped<ICommentRepository<Comments>, CommentRepository>();
+        services.AddScoped<ICommentService, CommentService>();
+
         services.AddHttpContextAccessor();
         services.AddMemoryCache();
 
@@ -73,7 +76,7 @@ public class Startup
                     policy.WithOrigins("http://localhost:4200", "https://main--booklibraryy.netlify.app")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
-                          .AllowCredentials(); // Bu satır önemli
+                          .AllowCredentials(); 
                 });
         });
 
@@ -112,7 +115,7 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        // Veritabanı veya başlangıç verileri
+       
         using (var scope = app.ApplicationServices.CreateScope())
         {
             var services = scope.ServiceProvider;
