@@ -59,7 +59,7 @@ namespace BookLibary.Api.Controllers
             return Ok(result);
 
         }
-        [HttpPost("getComment/{bookName}")]
+        [HttpGet("getComment/{bookName}")]
         public async Task<IActionResult> GetCommentByBookName(string bookName)
         {
             var result = await _commentService.GetCommentByBookName(bookName);
