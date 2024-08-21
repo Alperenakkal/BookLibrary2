@@ -40,36 +40,68 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
             return await _bookRepository.GetByNameAsync(name);
         }
 
-        //public async Task<RateBookResultDto> RateBookAsync(RateBookRequest request)
-        //{
-        //    if (!ObjectId.TryParse(request.BookId, out ObjectId objectId))
-        //    {
-        //        return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Geçersiz kitap ID'si" };
-        //    }
+        public async Task<RateBookResultDto> RateBookAsync(RateBookRequest request)
+        {
+            // Validate BookName
+            if (string.IsNullOrEmpty(request.BookName))
+            {
+                return new RateBookResultDto
+                {
+                    Success = false,
+                    Message = "Book name cannot be empty."
+                };
+            }
 
-        //    var book = await _bookRepository.GetByIdAsync(request.BookId);
-        //    if (book == null)
-        //    {
-        //        return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Kitap bulunamadı" };
-        //    }
+            // Validate Rating value
+            if (request.Rating < 1.0 || request.Rating > 5.0)
+            {
+                return new RateBookResultDto
+                {
+                    Success = false,
+                    Message = "Rating must be between 1.0 and 5.0."
+                };
+            }
 
-        //    book.RatingCount++;
-        //    book.TotalRating += request.Rating;
-        //    book.AverageRating = book.TotalRating / book.RatingCount;
+            // Fetch the book by name
+            var book = await _bookRepository.GetBookByNameAsync(request.BookName);
 
-        //    var updatedBook = await _bookRepository.UpdateBookAsync(objectId, book);
+            // Check if the book exists
+            if (book == null)
+            {
+                return new RateBookResultDto
+                {
+                    Success = false,
+                    Message = "Book not found."
+                };
+            }
 
-        //    if (updatedBook != null)
-        //    {
-        //        return new RateBookResultDto
-        //        {
-        //            Success = true,
-        //            AverageRating = updatedBook.AverageRating
-        //        };
-        //    }
+            // Initialize the Ratings list if it's null (just in case)
+            if (book.Ratings == null)
+            {
+                book.Ratings = new List<double>();
+            }
 
-        //    return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Kitap güncelleme işlemi başarısız" };
-        //}
+            // Add the new rating to the Ratings list
+            book.Ratings.Add(request.Rating);
+
+            // Update the RatingCount
+            book.RatingCount = book.Ratings.Count;
+
+            // Calculate the new AverageRating
+            book.AverageRating = book.Ratings.Average();
+
+            // Update the book with the new rating information
+            await _bookRepository.UpdateBookAsync(book.Id, book);
+
+            // Return the result
+            return new RateBookResultDto
+            {
+                Success = true,
+                AverageRating = book.AverageRating,
+                Message = "Rating successfully added."
+            };
+        }
+
 
 
     }

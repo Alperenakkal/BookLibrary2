@@ -60,7 +60,6 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
                         IsAvailable = borrowedBook.IsAvailable,
                         Stock = book.Stock,
                         Category = book.Category,
-                        TotalRating = book.TotalRating,
                         RatingCount = book.RatingCount,
                         AverageRating = book.AverageRating,
                     };
@@ -270,92 +269,6 @@ namespace BookLibary.Api.Services.AuthServices.BorrowServices
             }
         }
 
-
-
-
-
-        //public async Task AddtoReadoutBookAsync(BorrowBookByNameDto bookDto, string userName)
-        //{
-        //    // Fetch user by username
-        //    User user = await _userRepository.GetByNameAsync(userName);
-
-        //    if (user == null)
-        //    {
-        //        throw new KeyNotFoundException("Kullanıcı bulunamadı.");
-        //    }
-
-        //    // Extract book name from DTO
-        //    var bookName = bookDto.bookName;
-
-        //    // Check if the book is in the user's borrowed books list
-        //    var borrowedBook = user.BorrowBooks.FirstOrDefault(b => string.Equals(b.BookName, bookName, StringComparison.OrdinalIgnoreCase));
-
-        //    if (borrowedBook != null)
-        //    {
-        //        // Remove the book from borrowed list
-        //        user.BorrowBooks.Remove(borrowedBook);
-
-        //        // Check if the book is already in the ReadOutBooks list
-        //        var readOutBook = user.ReadOutBooks.FirstOrDefault(b => string.Equals(b.BookName, bookName, StringComparison.OrdinalIgnoreCase));
-
-        //        if (readOutBook != null)
-        //        {
-        //            // Increment the borrow count for existing read-out book
-        //            readOutBook.BorrowCount++;
-        //        }
-        //        else
-        //        {
-        //            // Add new book to ReadOutBooks list
-        //            user.ReadOutBooks.Add(new ReadoutBook
-        //            {
-        //                BookName = bookName,
-        //                BorrowCount = 1
-        //            });
-        //        }
-
-        //        // Update book details
-        //        var book = await _bookRepository.FindBookByNameAsync(bookName);
-        //        if (book != null)
-        //        {
-        //            // Increase book stock and mark as available
-        //            book.Stock += 1;
-        //            if (!book.IsAvailable)
-        //            {
-        //                book.IsAvailable = true;
-        //            }
-
-        //            try
-        //            {
-        //                // Update user information
-        //                var updateUserResult = await _userRepository.UpdateUserAsync(user.Id, user);
-        //                if (updateUserResult == null)
-        //                {
-        //                    throw new Exception("Kullanıcı güncellenemedi");
-        //                }
-
-        //                // Update book information
-        //                var bookUpdateResult = await _bookRepository.UpdateBookAsync(book.Id, book);
-        //                if (bookUpdateResult == null)
-        //                {
-        //                    throw new Exception("Kitap güncellenemedi");
-        //                }
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                throw new Exception("Güncelleme işlemi başarısız", ex);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            throw new KeyNotFoundException("Böyle bir kitap bulunamadı.");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        throw new InvalidOperationException("Kitap kullanıcı tarafından ödünç alınmamış.");
-        //    }
-        //}
-        //eski hali
         public async Task AddtoReadoutBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
             // Fetch user by username

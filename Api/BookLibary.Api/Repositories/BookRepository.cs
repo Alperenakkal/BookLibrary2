@@ -119,6 +119,11 @@ using BookLibary.Api.Models;
             var result = await _collection.ReplaceOneAsync(filter, updatedBook);
             return result.IsAcknowledged && result.ModifiedCount > 0 ? updatedBook : null;
         }
+        public async Task<Book> GetBookByNameAsync(string bookName)
+        {
+            return await _collection.Find(b => b.BookName == bookName).FirstOrDefaultAsync();
+        }
+
 
 
 

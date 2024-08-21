@@ -7,6 +7,7 @@ public interface IBook
         [BsonElement("BookName")]
         public string BookName { get; set; }
 
-
+        [BsonElement("Ratings")]
+        public List<double> Ratings { get; set; } 
     }
 }
