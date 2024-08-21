@@ -12,6 +12,8 @@ namespace BookLibary.Api.Repositories{
          Task<GetOneResult<Book>> DeleteByNameAsync(string bookName);
         Task<Book> FindBookByNameAsync(string bookName);
         Task<Book> UpdateBookAsync(ObjectId id, Book updatedBook);
+        Task<Book> GetBookByNameAsync(string bookName);
+
 
     }
 }
