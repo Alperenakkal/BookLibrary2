@@ -8,6 +8,6 @@ public interface IBook
         public string BookName { get; set; }
 
         [BsonElement("Ratings")]
-        public List<double> Ratings { get; set; } 
+        public List<Ratings> Ratings { get; set; } 
     }
 }

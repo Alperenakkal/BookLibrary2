@@ -1,6 +1,7 @@
 ﻿using BookLibary.Api.Dtos.BookDto;
 using BookLibary.Api.Models;
 using BookLibary.Api.Repositories;
+using DnsClient;
 using MongoDB.Bson;
 using System.Threading.Tasks;
 
@@ -9,10 +10,12 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
     public class BookService : IBookService
     {
         private readonly IBookRepository<Book> _bookRepository;
+        private readonly IUserRepository<User> _userRepository;
 
-        public BookService(IBookRepository<Book> bookRepository)
+        public BookService(IBookRepository<Book> bookRepository, IUserRepository<User> userRepository)
         {
             _bookRepository = bookRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<Book> CreateBookAsync(Book book)
@@ -40,8 +43,14 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
             return await _bookRepository.GetByNameAsync(name);
         }
 
-        public async Task<RateBookResultDto> RateBookAsync(RateBookRequest request)
+        public async Task<RateBookResultDto> RateBookAsync(RateBookRequest request, string UserName)
         {
+            User user = await _userRepository.GetByNameAsync(UserName);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+            }
+
             // Validate BookName
             if (string.IsNullOrEmpty(request.BookName))
             {
@@ -75,20 +84,34 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
                 };
             }
 
+            // Check if the user has already rated this book
+            if (book.Ratings.Any(r => r.UserName == UserName))
+            {
+                return new RateBookResultDto
+                {
+                    Success = false,
+                    Message = "You have already rated this book."
+                };
+            }
+
             // Initialize the Ratings list if it's null (just in case)
             if (book.Ratings == null)
             {
-                book.Ratings = new List<double>();
+                book.Ratings = new List<Ratings>();
             }
 
             // Add the new rating to the Ratings list
-            book.Ratings.Add(request.Rating);
+            book.Ratings.Add(new Ratings
+            {
+                UserName = UserName,
+                Value = request.Rating
+            });
 
             // Update the RatingCount
             book.RatingCount = book.Ratings.Count;
 
             // Calculate the new AverageRating
-            book.AverageRating = book.Ratings.Average();
+            book.AverageRating = book.Ratings.Average(r => r.Value);
 
             // Update the book with the new rating information
             await _bookRepository.UpdateBookAsync(book.Id, book);
@@ -102,8 +125,7 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
             };
         }
 
-
-
+    
     }
 
 }
