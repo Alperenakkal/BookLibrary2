@@ -40,36 +40,36 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
             return await _bookRepository.GetByNameAsync(name);
         }
 
-        public async Task<RateBookResultDto> RateBookAsync(RateBookRequest request)
-        {
-            if (!ObjectId.TryParse(request.BookId, out ObjectId objectId))
-            {
-                return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Geçersiz kitap ID'si" };
-            }
+        //public async Task<RateBookResultDto> RateBookAsync(RateBookRequest request)
+        //{
+        //    if (!ObjectId.TryParse(request.BookId, out ObjectId objectId))
+        //    {
+        //        return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Geçersiz kitap ID'si" };
+        //    }
 
-            var book = await _bookRepository.GetByIdAsync(request.BookId);
-            if (book == null)
-            {
-                return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Kitap bulunamadı" };
-            }
+        //    var book = await _bookRepository.GetByIdAsync(request.BookId);
+        //    if (book == null)
+        //    {
+        //        return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Kitap bulunamadı" };
+        //    }
 
-            book.RatingCount++;
-            book.TotalRating += request.Rating;
-            book.AverageRating = book.TotalRating / book.RatingCount;
+        //    book.RatingCount++;
+        //    book.TotalRating += request.Rating;
+        //    book.AverageRating = book.TotalRating / book.RatingCount;
 
-            var updatedBook = await _bookRepository.UpdateBookAsync(objectId, book);
+        //    var updatedBook = await _bookRepository.UpdateBookAsync(objectId, book);
 
-            if (updatedBook != null)
-            {
-                return new RateBookResultDto
-                {
-                    Success = true,
-                    AverageRating = updatedBook.AverageRating
-                };
-            }
+        //    if (updatedBook != null)
+        //    {
+        //        return new RateBookResultDto
+        //        {
+        //            Success = true,
+        //            AverageRating = updatedBook.AverageRating
+        //        };
+        //    }
 
-            return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Kitap güncelleme işlemi başarısız" };
-        }
+        //    return new RateBookResultDto { Success = false, AverageRating = 0, Message = "Kitap güncelleme işlemi başarısız" };
+        //}
 
 
     }
