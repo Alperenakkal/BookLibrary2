@@ -1,8 +1,9 @@
 ﻿namespace BookLibary.Api.Models
 {
-    public class Rating
+    public class Ratings
     {
         public string UserName { get; set; }
-        public double RatingValue { get; set; }
+        public double Value { get; set; }
     }
+
 }

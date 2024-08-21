@@ -90,9 +90,9 @@ namespace BookLibary.Api.Controllers
         }
 
        [HttpPost("rate-book")]
-        public async Task<IActionResult> RateBook([FromBody] RateBookRequest request)
+        public async Task<IActionResult> RateBook([FromBody] RateBookRequest request,string userName)
         {
-            var result = await _bookService.RateBookAsync(request);
+            var result = await _bookService.RateBookAsync(request,userName);
             if (!result.Success)
             {
              return NotFound(new { Message = result.Message });

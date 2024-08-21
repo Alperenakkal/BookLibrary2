@@ -43,7 +43,7 @@ namespace BookLibary.Api.Models
 
         [BsonElement("RatingCount")]
         public int RatingCount { get; set; }
-        public List<double> Ratings { get; set; }
+        public List<Ratings> Ratings { get; set; }
 
 
     }
