@@ -124,44 +124,44 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
                 Message = "Değerlendirme Başarıyla Yapılmıştır."
             };
         }
-        public async Task<UserBookRatingDto> GetUserBookRatingAsync(string bookName, string userName)
-        {
-            // Kullanıcıyı al
-            User user = await _userRepository.GetByNameAsync(userName);
-            if (user == null)
-            {
-                throw new KeyNotFoundException("Kullanıcı bulunamadı.");
-            }
-
-            // Kitabı ismine göre al
-            var book = await _bookRepository.GetBookByNameAsync(bookName);
-
-            // Kitabın varlığını kontrol et
-            if (book == null)
-            {
-                throw new KeyNotFoundException("Kitap bulunamadı.");
-            }
-
-            // Kullanıcının bu kitaba daha önce yaptığı değerlendirmeyi al
-            var existingRating = book.Ratings.FirstOrDefault(r => r.UserName == userName);
-
-            if (existingRating == null)
-            {
-                return new UserBookRatingDto
+                public async Task<UserBookRatingDto> GetUserBookRatingAsync(string bookName, string userName)
                 {
-                    Success = false,
-                    Message = "Bu kitap için değerlendirme bulunamadı."
-                };
-            }
+                    // Kullanıcıyı al
+                    User user = await _userRepository.GetByNameAsync(userName);
+                    if (user == null)
+                    {
+                        throw new KeyNotFoundException("Kullanıcı bulunamadı.");
+                    }
 
-            // Kullanıcının değerlendirmesini döndür
-            return new UserBookRatingDto
-            {
-                Success = true,
-                UserRating = existingRating.Value,
-                Message = "Değerlendirme başarıyla alındı."
-            };
-        }
+                    // Kitabı ismine göre al
+                    Book book = await _bookRepository.GetBookByNameAsync(bookName);
+
+                    // Kitabın varlığını kontrol et
+                    if (book == null)
+                    {
+                        throw new KeyNotFoundException("Kitap bulunamadı.");
+                    }
+
+                    // Kullanıcının bu kitaba daha önce yaptığı değerlendirmeyi al
+                    var existingRating = book.Ratings.FirstOrDefault(r => r.UserName == userName);
+
+                    if (existingRating == null)
+                    {
+                        return new UserBookRatingDto
+                        {
+                            Success = false,
+                            Message = "Bu kitap için değerlendirme bulunamadı."
+                        };
+                    }
+
+                    // Kullanıcının değerlendirmesini döndür
+                    return new UserBookRatingDto
+                    {
+                        Success = true,
+                        UserRating = existingRating.Value,
+                        Message = "Değerlendirme başarıyla alındı."
+                    };
+                }
 
 
 

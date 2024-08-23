@@ -99,8 +99,8 @@ namespace BookLibary.Api.Controllers
             }
            return Ok(new { message = "Puan kaydedildi.", averageRating = result.AverageRating });
         }
-        [HttpGet("getUserRating")]
-        public async Task<IActionResult> GetUserRating([FromQuery] string bookName, [FromQuery] string userName)
+        [HttpGet("getUserRating/{bookName}/{userName}")]
+        public async Task<IActionResult> GetUserRating(string bookName,string userName)
         {
             var result = await _bookService.GetUserBookRatingAsync(bookName, userName);
 
