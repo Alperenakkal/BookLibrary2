@@ -15,6 +15,7 @@ namespace BookLibary.Api.Services.AuthServices.BookServices
         // Task<GetOneResult<Book>> UpdateBookAsync(string id, Book book);
         Task<GetOneResult<Book>> DeleteBook(string bookName);
         Task<RateBookResultDto> RateBookAsync(RateBookRequest request, string UserName);
+        Task<UserBookRatingDto> GetUserBookRatingAsync(string bookName, string userName);
 
     }
 }
