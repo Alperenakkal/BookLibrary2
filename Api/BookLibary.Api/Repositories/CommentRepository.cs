@@ -37,5 +37,18 @@ namespace BookLibary.Api.Repositories
                 throw new Exception("GetCommentByBookNameRepository[CommentRepository 27] Fetch operation failed");
             }
         }
+        public async Task<Comments> GetCommentByBookUserName(string userName)
+        {
+            try
+            {
+                var filter = Builders<Comments>.Filter.Eq(x => x.UserName, userName);
+                return await _model.Find(filter).FirstOrDefaultAsync();
+            }
+            catch (Exception)
+            {
+
+                throw new Exception("GetCommentByBookNameRepository[CommentRepository 27] Fetch operation failed");
+            }
+        }
     }
 }

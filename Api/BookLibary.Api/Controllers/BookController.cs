@@ -67,6 +67,14 @@ namespace BookLibary.Api.Controllers
             return Ok(result);
 
         }
+        [HttpGet("getCommentbyUserName/{userName}")]
+        public async Task<IActionResult> GetCommentByUserName(string userName)
+        {
+            var result = await _commentService.GetCommentByUserName(userName);
+
+            return Ok(result);
+
+        }
         [HttpPost]
         public async Task<IActionResult> CreateBook([FromBody] Book book)
         {

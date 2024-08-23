@@ -29,6 +29,16 @@ namespace BookLibary.Api.Services.AuthServices.CommentService
                 {
                     throw new BadRequestException($"{comment} bad request");
                 }
+                List<Comments> commentList = await _commentRepository.GetCommentByBookName(bookName);
+                Comments getCommentByUserName = await _commentRepository.GetCommentByBookUserName(comment.UserName);
+                foreach (var comments in commentList)
+                {
+                    if (comments.UserName == comment.UserName)
+                    {
+                        comment.Status = false;
+                    }
+
+                }
                 Comments newComments = new Comments
                 {
                     BookName = bookName,
@@ -37,6 +47,11 @@ namespace BookLibary.Api.Services.AuthServices.CommentService
                     UserName = comment.UserName,
 
                 };
+                if (newComments.Status == false)
+                {
+                    Console.WriteLine("Aynı kitaba iki kere yorum yapamazsınız");
+                    throw new NotFoundException($"Ayni kitaba bir kere yorum yapabilirsiniz");
+                }
 
                 Comments ınsertComment = await _commentRepository.InsertOneAsync(newComments);
                 AddCommentResponse commentResponse = new AddCommentResponse
@@ -48,9 +63,9 @@ namespace BookLibary.Api.Services.AuthServices.CommentService
                 };
                 return commentResponse;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new NotFoundException($"Not Found CreatCommentService");
+                throw new NotFoundException($"{ex.Message}");
 
             }
 
@@ -63,8 +78,6 @@ namespace BookLibary.Api.Services.AuthServices.CommentService
                 {
                     throw new BadRequestException($"{bookName} is not empty");
                 }
-
-                // Yorumlar listesini alıyoruz
                 List<Comments> commentList = await _commentRepository.GetCommentByBookName(bookName);
 
                 if (commentList == null || !commentList.Any())
@@ -72,10 +85,10 @@ namespace BookLibary.Api.Services.AuthServices.CommentService
                     throw new NotFoundException($"CommentsRepositoryden beklenen değer gelmedi");
                 }
 
-                // Dönüş olarak kullanılacak BookCommentDto türünde bir liste oluşturuyoruz
+           
                 List<BookCommentDto> bookCommentDtoList = new List<BookCommentDto>();
 
-                // Yorum listesindeki her bir yorumu dönüştürüp, listeye ekliyoruz
+               
                 foreach (var comments in commentList)
                 {
                     BookCommentDto bookCommentDto = new BookCommentDto
@@ -90,6 +103,37 @@ namespace BookLibary.Api.Services.AuthServices.CommentService
                 }
 
                 return bookCommentDtoList;
+            }
+            catch (Exception)
+            {
+                throw new NotFoundException($"GetCommentByBookNameService[CommentService 57] not found");
+            }
+        }
+        public async Task<BookCommentDto> GetCommentByUserName(string userName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userName))
+                {
+                    throw new BadRequestException($"{userName} is not empty");
+                }
+                Comments comment = await _commentRepository.GetCommentByBookUserName(userName);
+
+                if (comment == null)
+                {
+                    throw new NotFoundException($"CommentsRepositoryden beklenen değer gelmedi");
+                }
+          
+                
+                    BookCommentDto bookCommentDto = new BookCommentDto
+                    {
+                        BookName=comment.BookName,
+                        Comment=comment.UserName,
+                        Status=comment.Status,
+                        UserName=comment.UserName
+                    };    
+
+                return bookCommentDto;
             }
             catch (Exception)
             {
