@@ -35,7 +35,7 @@ namespace BookLibary.Api.Controllers
 
 
         
-         [HttpGet("GetBorrowBooks")]
+         [HttpGet("GetBorrowBooks/{userName}")]
         public async Task<IActionResult> GetByNameAsync(string userName)
         {
             //var userId = await _tokenHelperService.GetIdFromToken();
@@ -45,8 +45,8 @@ namespace BookLibary.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost("AddBorrow")]
-        public async Task<IActionResult> AddBorrowedBook([FromBody] BorrowBookByNameDto bookDto, [FromQuery] string userName)
+        [HttpPost("AddBorrow/{userName}")]
+        public async Task<IActionResult> AddBorrowedBook( BorrowBookByNameDto bookDto,string userName)
         {
             try
             {
@@ -69,8 +69,8 @@ namespace BookLibary.Api.Controllers
         }
 
 
-        [HttpDelete("RemoveBorrowed")]
-        public async Task<IActionResult> RemoveBorrowedBookAsync([FromBody] BorrowBookByNameDto bookDto, [FromQuery] string userName)
+        [HttpDelete("RemoveBorrowed/{userName}")]
+        public async Task<IActionResult> RemoveBorrowedBookAsync(BorrowBookByNameDto bookDto, string userName)
         {
         
 
@@ -80,8 +80,8 @@ namespace BookLibary.Api.Controllers
 
 
 
-        [HttpPut("UpdateBorrowedBook")]
-        public async Task<IActionResult> UpdateBook([FromBody] BorrowBookByNameDto bookDto, [FromQuery] string userName)
+        [HttpPut("UpdateBorrowedBook/{userName}")]
+        public async Task<IActionResult> UpdateBook(BorrowBookByNameDto bookDto,string userName)
         {
             try
             {
@@ -103,7 +103,7 @@ namespace BookLibary.Api.Controllers
         }
 
 
-        [HttpGet("GetReadOutByName")]
+        [HttpGet("GetReadOutByName/{userName}")]
         public async Task<IActionResult> GetReadoutBookByNameAsync(string userName)
         {
            // var userId = await _tokenHelperService.GetIdFromToken();
